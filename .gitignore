@@ -1,0 +1,156 @@
+# ============================================================
+# 📦 AY INT. HOSPITAL — Patient Portal
+# ─────────────────────────────────────────────
+# Git ignore patterns — keeping the repo clean
+# ============================================================
+
+# ============================================================
+# 🎯 DEPENDENCIES
+# ============================================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# ============================================================
+# 🎯 BUILD OUTPUT
+# ============================================================
+dist/
+dist-ssr/
+build/
+out/
+.vite/
+.vite-temp/
+*.local
+
+# ============================================================
+# 🎯 CACHE
+# ============================================================
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.cache/
+.parcel-cache/
+.npm/
+.node_repl_history
+
+# ============================================================
+# 🎯 ENVIRONMENT VARIABLES (Rule 4 — sensitive!)
+# ============================================================
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ============================================================
+# 🎯 TESTING & COVERAGE
+# ============================================================
+coverage/
+*.lcov
+.nyc_output/
+junit.xml
+
+# ============================================================
+# 🎯 DEPLOYMENT PLATFORMS
+# ============================================================
+.vercel/
+.netlify/
+.firebase/
+.surge/
+.now/
+
+# ============================================================
+# 🎯 EDITOR & IDE
+# ============================================================
+# VS Code — keep settings, extensions, and tasks
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# JetBrains (WebStorm, IntelliJ)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# ============================================================
+# 🎯 OPERATING SYSTEM
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# 🎯 VISUAL STUDIO
+# ============================================================
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============================================================
+# 🎯 TEMPORARY FILES
+# ============================================================
+*.tmp
+*.temp
+*.bak
+*.orig
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================================
+# 🎯 PROJECT-SPECIFIC
+# ============================================================
+# Trash / scratch folder
+_trash/
+
+# Personal notes
+notes.md
+TODO.md
+scratch/
+playground/
+
+# Screenshots (development)
+screenshot-*.png
+debug-*.png
+test-*.png
+
+# ============================================================
+# 🎯 KEEP (DO NOT IGNORE)
+# ============================================================
+# Note: The following are intentionally NOT ignored:
+# - .vscode/settings.json (team consistency)
+# - .vscode/extensions.json (recommended extensions)
+# - package-lock.json / yarn.lock / pnpm-lock.yaml (reproducible builds)
+# - public/ assets (favicons, images)
+# - README.md, LICENSE
