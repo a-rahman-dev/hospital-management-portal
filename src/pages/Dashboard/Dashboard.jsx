@@ -23,12 +23,12 @@ import TodaySchedule from "@/components/dashboard/TodaySchedule";
 /* ============================================================
    🎨 DASHBOARD SECTION COLOR PALETTE (Rule 5)
    ─────────────────────────────────────────────
-   Primary:   Cyan → Violet → Blue (header/brand)
-   Alerts:    Rose / Amber
-   Stats:     Indigo / Emerald / Amber / Cyan
-   Trends:    Blue / Violet
+   Primary:     Cyan → Violet → Blue (header/brand)
+   Alerts:      Rose / Amber
+   Stats:       Indigo / Emerald / Amber / Cyan
+   Trends:      Blue / Violet
    Appointments: Violet / Fuchsia
-   Patients:  Blue / Indigo / Violet
+   Patients:    Blue / Indigo / Violet
    ============================================================ */
 
 /* ============================================================
@@ -118,7 +118,7 @@ export default function Dashboard() {
   }, []);
 
   /* ============================================================
-     🎯 Handlers (Rule 3: Every button works)
+      🎯 Handlers (Rule 3: Every button works)
      ============================================================ */
 
   /* ---- WelcomeBanner actions ---- */
@@ -213,15 +213,16 @@ export default function Dashboard() {
   }, []);
 
   /* ============================================================
-     RENDER
+      RENDER
      ============================================================ */
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0 }}
+        key="dashboard-root-view"
+        initial={false}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.2 }}
         className="space-y-3 sm:space-y-4"
       >
         {/* ============ WELCOME BANNER ============ */}
