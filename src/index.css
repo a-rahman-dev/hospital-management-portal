@@ -402,3 +402,8 @@ html.dark input[type="date"]::-webkit-calendar-picker-indicator {
     padding-right: 2rem;
   }
 }
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}

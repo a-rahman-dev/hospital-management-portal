@@ -49,9 +49,8 @@ export default function DashboardLayout() {
   return (
     <div
       className={cn(
-        /* Height — dvh fixes mobile Safari URL bar issue */
-        "h-screen h-[100dvh]",
-        "w-full flex overflow-hidden",
+        /* Fixed viewport lock: window scroll ko bilkul disable karega */
+        "fixed inset-0 h-screen h-[100dvh] w-screen overflow-hidden flex",
         /* Background — uses CSS var for theming */
         "bg-slate-50 dark:bg-[#0B1220]",
         "transition-colors duration-300"
