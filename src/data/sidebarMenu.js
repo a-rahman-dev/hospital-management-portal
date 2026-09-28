@@ -49,31 +49,31 @@ export const sidebarMenu = [
         children: [
           {
             name: "Patient Directory",
-            path: "/dashboard/patients",
+            path: "/patients",
             icon: Users,
             description: "All registered patients",
           },
           {
             name: "Appointments",
-            path: "/dashboard/patients/appointments",
+            path: "/patients/appointments",
             icon: Calendar,
             description: "Scheduling & rosters",
           },
           {
             name: "Medications",
-            path: "/dashboard/patients/medications",
+            path: "/patients/medications",
             icon: Pill,
             description: "E-prescriptions & refills",
           },
           {
             name: "Lab Reports",
-            path: "/dashboard/patients/lab-reports",
+            path: "/patients/lab-reports",
             icon: FlaskConical,
             description: "Diagnostic test results",
           },
           {
             name: "Billing",
-            path: "/dashboard/patients/billing",
+            path: "/patients/billing",
             icon: DollarSign,
             description: "Invoices & claims",
           },
@@ -81,19 +81,19 @@ export const sidebarMenu = [
       },
       {
         name: "ICD Codes",
-        path: "/dashboard/icd",
+        path: "/icd",
         icon: Stethoscope,
         description: "ICD-10 & CPT catalog",
       },
       {
         name: "OBGYN Diagnosis",
-        path: "/dashboard/obgyn",
+        path: "/obgyn",
         icon: Baby,
         description: "Obstetric registry",
       },
       {
         name: "Procedures",
-        path: "/dashboard/procedures",
+        path: "/procedures",
         icon: Scissors,
         description: "Surgical & clinical procedures",
       },
@@ -108,37 +108,37 @@ export const sidebarMenu = [
     items: [
       {
         name: "Practice Setting",
-        path: "/dashboard/practice-setting",
+        path: "/practice-setting",
         icon: Briefcase,
         description: "Clinic configuration",
       },
       {
         name: "Practices",
-        path: "/dashboard/practices",
+        path: "/practices",
         icon: Building2,
         description: "Multi-site network",
       },
       {
         name: "Facilities",
-        path: "/dashboard/facilities",
+        path: "/facilities",
         icon: Hospital,
         description: "Wards & bed capacity",
       },
       {
         name: "Providers",
-        path: "/dashboard/providers",
+        path: "/providers",
         icon: UserCog,
         description: "Credentialed physicians",
       },
       {
         name: "Users",
-        path: "/dashboard/users",
+        path: "/users",
         icon: Users,
         description: "System users & roles",
       },
       {
         name: "Insurance",
-        path: "/dashboard/insurance",
+        path: "/insurance",
         icon: Shield,
         description: "Payers & clearinghouse",
       },
@@ -158,19 +158,19 @@ export const sidebarMenu = [
         children: [
           {
             name: "Modules",
-            path: "/dashboard/modules",
+            path: "/modules",
             icon: LayoutGrid,
             description: "Feature toggles",
           },
           {
             name: "Roles",
-            path: "/dashboard/modules/roles",
+            path: "/modules/roles",
             icon: Award,
             description: "Role definitions",
           },
           {
             name: "Permissions",
-            path: "/dashboard/modules/permissions",
+            path: "/modules/permissions",
             icon: Key,
             description: "Access matrix",
           },
@@ -180,10 +180,7 @@ export const sidebarMenu = [
   },
 ];
 
-/* ============================================================
-   🎯 HELPERS
-   ============================================================ */
-
+/* Helper functions bilkul waise hi rahenge */
 export const getAllMenuItems = () => {
   const items = [];
   sidebarMenu.forEach((section) => {

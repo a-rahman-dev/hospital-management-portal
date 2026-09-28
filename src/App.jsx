@@ -48,43 +48,42 @@ export default function App() {
       {/* ---------- PUBLIC LANDING ---------- */}
       <Route path="/" element={<Landing />} />
 
-      {/* ---------- DASHBOARD LAYOUT (nested routes) ---------- */}
-      <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<Dashboard />} />
+      {/* ---------- PORTAL APPS WITH DASHBOARD LAYOUT ---------- */}
+      {/* Notice: pathless layout — Sidebar & Topbar sab modules mein rahenge */}
+      <Route element={<DashboardLayout />}>
+        {/* Main Dashboard */}
+        <Route path="/dashboard" element={<Dashboard />} />
 
         {/* ============ PATIENTS ============ */}
-        {/* Directory */}
-        <Route path="patients" element={<Patients />} />
+        <Route path="/patients" element={<Patients />} />
+        <Route path="/patients/appointments" element={<PatientAppointments />} />
+        <Route path="/patients/billing" element={<PatientBilling />} />
+        <Route path="/patients/lab-reports" element={<PatientLabReports />} />
+        <Route path="/patients/medications" element={<PatientMedications />} />
 
-        {/* Shortcuts (no id) — for sidebar & bento cards */}
-        <Route path="patients/appointments" element={<PatientAppointments />} />
-        <Route path="patients/billing" element={<PatientBilling />} />
-        <Route path="patients/lab-reports" element={<PatientLabReports />} />
-        <Route path="patients/medications" element={<PatientMedications />} />
-
-        {/* Deep links (with patient id) */}
-        <Route path="patients/:id/appointments" element={<PatientAppointments />} />
-        <Route path="patients/:id/billing" element={<PatientBilling />} />
-        <Route path="patients/:id/lab-reports" element={<PatientLabReports />} />
-        <Route path="patients/:id/medications" element={<PatientMedications />} />
+        {/* Deep links with ID */}
+        <Route path="/patients/:id/appointments" element={<PatientAppointments />} />
+        <Route path="/patients/:id/billing" element={<PatientBilling />} />
+        <Route path="/patients/:id/lab-reports" element={<PatientLabReports />} />
+        <Route path="/patients/:id/medications" element={<PatientMedications />} />
 
         {/* ============ CLINICAL ============ */}
-        <Route path="providers" element={<Providers />} />
-        <Route path="practices" element={<Practices />} />
-        <Route path="procedures" element={<Procedures />} />
-        <Route path="insurance" element={<Insurance />} />
-        <Route path="icd" element={<ICD />} />
-        <Route path="obgyn" element={<OBGYN />} />
-        <Route path="facilities" element={<Facilities />} />
+        <Route path="/providers" element={<Providers />} />
+        <Route path="/practices" element={<Practices />} />
+        <Route path="/procedures" element={<Procedures />} />
+        <Route path="/insurance" element={<Insurance />} />
+        <Route path="/icd" element={<ICD />} />
+        <Route path="/obgyn" element={<OBGYN />} />
+        <Route path="/facilities" element={<Facilities />} />
 
         {/* ============ ADMIN ============ */}
-        <Route path="users" element={<Users />} />
-        <Route path="practice-setting" element={<PracticeSetting />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/practice-setting" element={<PracticeSetting />} />
 
         {/* ============ SYSTEM — Module Management ============ */}
-        <Route path="modules" element={<ModuleManagement />} />
-        <Route path="modules/roles" element={<ModuleManagement />} />
-        <Route path="modules/permissions" element={<ModuleManagement />} />
+        <Route path="/modules" element={<ModuleManagement />} />
+        <Route path="/modules/roles" element={<ModuleManagement />} />
+        <Route path="/modules/permissions" element={<ModuleManagement />} />
       </Route>
 
       {/* ---------- FALLBACK ---------- */}
