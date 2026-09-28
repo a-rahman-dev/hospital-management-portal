@@ -96,7 +96,7 @@ export default function DashboardLayout() {
           )}
         >
           {/* Page content with subtle entrance animation */}
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={location.pathname}
               initial={
@@ -106,9 +106,9 @@ export default function DashboardLayout() {
                 prefersReduced ? false : { opacity: 1, y: 0 }
               }
               exit={
-                prefersReduced ? false : { opacity: 0, y: -8 }
+                prefersReduced ? false : { opacity: 0 }
               }
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
             >
               <Outlet />
             </motion.div>
