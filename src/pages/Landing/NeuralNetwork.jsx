@@ -1,620 +1,434 @@
-import { useEffect, useRef, useState, useMemo } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-
-/* ============================================================
-   🎨 NEURAL NETWORK BACKGROUND (Rule 5)
-   ─────────────────────────────────────────────
-   Cinematic animated background for Hero section.
-   
-   Optimizations:
-   - useReducedMotion: Disables all animations
-   - Mobile: Reduces particle count (60 → 25)
-   - Performance: will-change hints
-   ============================================================ */
+import React, { useEffect, useRef } from "react";
 
 export default function NeuralNetwork() {
-  const containerRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const [mounted, setMounted] = useState(false);
-  const [burstNodes, setBurstNodes] = useState([]);
-  const [trail, setTrail] = useState([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const canvasRef = useRef(null);
 
-  const prefersReduced = useReducedMotion();
-
-  /* ============================================================
-     🎯 DETECT MOBILE (Rule 1)
-     ============================================================ */
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  /* ============================================================
-     🎯 NODES (memoized)
-     ============================================================ */
-  const nodes = useMemo(
-    () => [
-      // Background layer (blurred, small)
-      { id: 1, x: 8, y: 15, size: 2, color: "#06b6d4", depth: 3 },
-      { id: 2, x: 22, y: 8, size: 1.5, color: "#8b5cf6", depth: 3 },
-      { id: 3, x: 35, y: 22, size: 2, color: "#10b981", depth: 3 },
-      { id: 4, x: 55, y: 12, size: 1.5, color: "#06b6d4", depth: 3 },
-      { id: 5, x: 72, y: 18, size: 2, color: "#f43f5e", depth: 3 },
-      { id: 6, x: 88, y: 10, size: 1.5, color: "#8b5cf6", depth: 3 },
-      // Middle layer
-      { id: 7, x: 12, y: 45, size: 2.5, color: "#f59e0b", depth: 2 },
-      { id: 8, x: 28, y: 55, size: 2.5, color: "#06b6d4", depth: 2 },
-      { id: 9, x: 45, y: 48, size: 2, color: "#10b981", depth: 2 },
-      { id: 10, x: 62, y: 52, size: 2.5, color: "#8b5cf6", depth: 2 },
-      { id: 11, x: 82, y: 45, size: 2.5, color: "#06b6d4", depth: 2 },
-      // Foreground layer (sharp, big)
-      { id: 12, x: 18, y: 78, size: 3.5, color: "#f43f5e", depth: 1 },
-      { id: 13, x: 38, y: 85, size: 3, color: "#8b5cf6", depth: 1 },
-      { id: 14, x: 58, y: 80, size: 3.5, color: "#06b6d4", depth: 1 },
-      { id: 15, x: 78, y: 88, size: 3, color: "#10b981", depth: 1 },
-      { id: 16, x: 92, y: 72, size: 3, color: "#f59e0b", depth: 1 },
-      { id: 17, x: 5, y: 65, size: 3, color: "#06b6d4", depth: 1 },
-      { id: 18, x: 50, y: 70, size: 3.5, color: "#8b5cf6", depth: 1 },
-      { id: 19, x: 68, y: 88, size: 3, color: "#10b981", depth: 1 },
-      { id: 20, x: 95, y: 40, size: 3, color: "#f43f5e", depth: 1 },
-    ],
-    []
-  );
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
 
-  /* ============================================================
-     🎯 CONNECTIONS (memoized)
-     ============================================================ */
-  const connections = useMemo(
-    () => [
-      { from: 1, to: 2, weight: 0.15, layer: 1 },
-      { from: 2, to: 3, weight: 0.15, layer: 1 },
-      { from: 3, to: 4, weight: 0.15, layer: 1 },
-      { from: 4, to: 5, weight: 0.15, layer: 1 },
-      { from: 5, to: 6, weight: 0.15, layer: 1 },
-      { from: 7, to: 8, weight: 0.15, layer: 1 },
-      { from: 8, to: 9, weight: 0.15, layer: 1 },
-      { from: 9, to: 10, weight: 0.15, layer: 1 },
-      { from: 10, to: 11, weight: 0.15, layer: 1 },
-      { from: 12, to: 13, weight: 0.15, layer: 1 },
-      { from: 13, to: 14, weight: 0.15, layer: 1 },
-      { from: 14, to: 15, weight: 0.15, layer: 1 },
-      { from: 15, to: 16, weight: 0.15, layer: 1 },
-      { from: 1, to: 7, weight: 0.1, layer: 2 },
-      { from: 2, to: 8, weight: 0.1, layer: 2 },
-      { from: 3, to: 9, weight: 0.1, layer: 2 },
-      { from: 4, to: 10, weight: 0.1, layer: 2 },
-      { from: 5, to: 11, weight: 0.1, layer: 2 },
-      { from: 6, to: 11, weight: 0.1, layer: 2 },
-      { from: 7, to: 12, weight: 0.1, layer: 2 },
-      { from: 8, to: 13, weight: 0.1, layer: 2 },
-      { from: 9, to: 14, weight: 0.1, layer: 2 },
-      { from: 10, to: 14, weight: 0.1, layer: 2 },
-      { from: 11, to: 15, weight: 0.1, layer: 2 },
-      { from: 11, to: 16, weight: 0.1, layer: 2 },
-      { from: 1, to: 8, weight: 0.06, layer: 3 },
-      { from: 3, to: 10, weight: 0.06, layer: 3 },
-      { from: 4, to: 9, weight: 0.06, layer: 3 },
-      { from: 6, to: 20, weight: 0.06, layer: 3 },
-      { from: 7, to: 17, weight: 0.06, layer: 3 },
-      { from: 8, to: 17, weight: 0.06, layer: 3 },
-      { from: 9, to: 18, weight: 0.06, layer: 3 },
-      { from: 10, to: 18, weight: 0.06, layer: 3 },
-      { from: 13, to: 18, weight: 0.06, layer: 3 },
-      { from: 14, to: 19, weight: 0.06, layer: 3 },
-      { from: 15, to: 19, weight: 0.06, layer: 3 },
-      { from: 11, to: 20, weight: 0.06, layer: 3 },
-      { from: 16, to: 20, weight: 0.06, layer: 3 },
-    ],
-    []
-  );
+    let animationFrameId;
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
 
-  /* ============================================================
-     🎯 MOUNT + MOUSE EFFECTS (with reduced motion)
-     ============================================================ */
-  useEffect(() => {
-    setMounted(true);
+    // High-DPI Retina Screen scaling function
+    const resizeCanvas = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
 
-    // Skip mouse effects on mobile or reduced motion
-    if (prefersReduced || isMobile) return;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
 
-    let lastTrailTime = 0;
+      ctx.scale(dpr, dpr);
+    };
+
+    resizeCanvas();
+
+    // Responsive configuration based on screen width
+    const isMobile = width < 768;
+    const isTablet = width >= 768 && width < 1024;
+    const nodeCount = isMobile ? 40 : isTablet ? 70 : 110;
+    const maxConnectionDistance = isMobile ? 95 : 145;
+    const maxSignals = isMobile ? 6 : 14;
+
+    // Window level cursor tracking (Zero scroll blocking)
+    const mouse = {
+      x: null,
+      y: null,
+      radius: isMobile ? 100 : 165,
+      active: false,
+    };
 
     const handleMouseMove = (e) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setMousePos({ x, y });
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    };
 
-      // Mouse trail
-      const now = Date.now();
-      if (now - lastTrailTime > 40) {
-        lastTrailTime = now;
-        const trailId = now;
-        const colors = ["#06b6d4", "#8b5cf6", "#10b981", "#f43f5e", "#f59e0b"];
-        setTrail((prev) => [
-          ...prev.slice(-15),
-          {
-            id: trailId,
-            x,
-            y,
-            color: colors[Math.floor(Math.random() * colors.length)],
-          },
-        ]);
-        setTimeout(() => {
-          setTrail((prev) => prev.filter((t) => t.id !== trailId));
-        }, 800);
-      }
-
-      // Burst effect
-      if (Math.random() > 0.96) {
-        const burstId = Date.now();
-        setBurstNodes((prev) => [
-          ...prev.slice(-2),
-          {
-            id: burstId,
-            x,
-            y,
-            color: nodes[Math.floor(Math.random() * nodes.length)].color,
-          },
-        ]);
-        setTimeout(() => {
-          setBurstNodes((prev) => prev.filter((b) => b.id !== burstId));
-        }, 1200);
+    const handleTouchMove = (e) => {
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+        mouse.active = true;
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [prefersReduced, isMobile, nodes]);
+    const handleMouseLeave = () => {
+      mouse.x = null;
+      mouse.y = null;
+      mouse.active = false;
+    };
 
-  /* ============================================================
-     🎯 DUST PARTICLES (reduced count on mobile)
-     ============================================================ */
-  const dustCount = isMobile ? 25 : 60;
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("mouseleave", handleMouseLeave, { passive: true });
+    window.addEventListener("touchend", handleMouseLeave, { passive: true });
+
+    let resizeTimeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resizeCanvas();
+      }, 100);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clinical Neon Accent Colors
+    const nodeColors = [
+      { r: 56, g: 189, b: 248 }, // Cyan 400
+      { r: 45, g: 212, b: 191 }, // Teal 400
+      { r: 99, g: 102, b: 241 }, // Indigo 500
+      { r: 52, g: 211, b: 153 }, // Emerald 400
+    ];
+
+    // Neural Node Class
+    class NeuralNode {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(init = false) {
+        this.x = init ? Math.random() * width : Math.random() < 0.5 ? 0 : width;
+        this.y = init ? Math.random() * height : Math.random() * height;
+        this.vx = (Math.random() - 0.5) * (isMobile ? 0.35 : 0.52);
+        this.vy = (Math.random() - 0.5) * (isMobile ? 0.35 : 0.52);
+        this.radius = Math.random() * 1.6 + 1.2;
+        this.baseRadius = this.radius;
+        this.color = nodeColors[Math.floor(Math.random() * nodeColors.length)];
+        this.baseAlpha = Math.random() * 0.35 + 0.22;
+        this.alpha = this.baseAlpha;
+        this.pulseSpeed = Math.random() * 0.03 + 0.015;
+        this.pulseAngle = Math.random() * Math.PI * 2;
+        this.isHub = Math.random() > 0.84;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+
+        this.pulseAngle += this.pulseSpeed;
+        const pulse = Math.sin(this.pulseAngle) * 0.5 + 0.5;
+        this.radius = this.baseRadius + pulse * (this.isHub ? 1.5 : 0.7);
+
+        // Magnetic Attraction
+        if (mouse.active && mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouse.radius && dist > 1) {
+            const force = (mouse.radius - dist) / mouse.radius;
+            const pull = force * 0.9;
+            this.x += (dx / dist) * pull;
+            this.y += (dy / dist) * pull;
+            this.alpha = Math.min(0.9, this.baseAlpha + force * 0.5);
+          } else {
+            this.alpha = this.baseAlpha;
+          }
+        } else {
+          this.alpha = this.baseAlpha;
+        }
+      }
+
+      draw() {
+        const { r, g, b } = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.alpha})`;
+        ctx.fill();
+
+        if (this.isHub) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius * 2.8, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.alpha * 0.15})`;
+          ctx.fill();
+        }
+      }
+    }
+
+    // Synaptic Data Signals Class
+    class SynapticSignal {
+      constructor(nodeA, nodeB) {
+        this.from = nodeA;
+        this.to = nodeB;
+        this.progress = 0;
+        this.speed = Math.random() * 0.012 + 0.007;
+        this.size = Math.random() * 1.5 + 1.2;
+        this.color = Math.random() > 0.5 ? "rgba(45, 212, 191, 0.95)" : "rgba(56, 189, 248, 0.95)";
+      }
+
+      update() {
+        this.progress += this.speed;
+      }
+
+      draw() {
+        const curX = this.from.x + (this.to.x - this.from.x) * this.progress;
+        const curY = this.from.y + (this.to.y - this.from.y) * this.progress;
+
+        ctx.beginPath();
+        ctx.arc(curX, curY, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = "#38bdf8";
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // Sonar Wave Scanner Class
+    class SonarWave {
+      constructor() {
+        this.x = width * 0.5 + (Math.random() - 0.5) * (width * 0.4);
+        this.y = height * 0.4 + (Math.random() - 0.5) * (height * 0.3);
+        this.radius = 5;
+        this.maxRadius = Math.random() * 160 + 120;
+        this.alpha = 0.22;
+        this.speed = 0.75;
+      }
+
+      update() {
+        this.radius += this.speed;
+        this.alpha = 0.22 * (1 - this.radius / this.maxRadius);
+      }
+
+      draw() {
+        if (this.alpha <= 0) return;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(56, 189, 248, ${this.alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    const nodes = Array.from({ length: nodeCount }, () => new NeuralNode());
+    const signals = [];
+    const sonarWaves = [];
+
+    const waveInterval = setInterval(() => {
+      if (sonarWaves.length < 2 && Math.random() > 0.3) {
+        sonarWaves.push(new SonarWave());
+      }
+    }, 4500);
+
+    const signalInterval = setInterval(() => {
+      if (signals.length < maxSignals && nodes.length > 2) {
+        const idxA = Math.floor(Math.random() * nodes.length);
+        const idxB = Math.floor(Math.random() * nodes.length);
+
+        if (idxA !== idxB) {
+          const dx = nodes[idxA].x - nodes[idxB].x;
+          const dy = nodes[idxA].y - nodes[idxB].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < maxConnectionDistance) {
+            signals.push(new SynapticSignal(nodes[idxA], nodes[idxB]));
+          }
+        }
+      }
+    }, 800);
+
+    // Architectural Telemetry Grid
+    const drawTelemetryGrid = () => {
+      const gridSize = 64;
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.45)";
+      ctx.lineWidth = 0.5;
+
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+      }
+      ctx.stroke();
+    };
+
+    // Render loop
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      drawTelemetryGrid();
+
+      // Draw Sonar Waves
+      for (let i = sonarWaves.length - 1; i >= 0; i--) {
+        const wave = sonarWaves[i];
+        wave.update();
+        wave.draw();
+        if (wave.alpha <= 0 || wave.radius >= wave.maxRadius) {
+          sonarWaves.splice(i, 1);
+        }
+      }
+
+      // Draw Synaptic Connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < maxConnectionDistance) {
+            const normalizedDist = 1 - dist / maxConnectionDistance;
+            const alpha = normalizedDist * 0.18;
+
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+
+            const grad = ctx.createLinearGradient(
+              nodes[i].x,
+              nodes[i].y,
+              nodes[j].x,
+              nodes[j].y
+            );
+            grad.addColorStop(0, `rgba(${nodes[i].color.r}, ${nodes[i].color.g}, ${nodes[i].color.b}, ${alpha})`);
+            grad.addColorStop(1, `rgba(${nodes[j].color.r}, ${nodes[j].color.g}, ${nodes[j].color.b}, ${alpha})`);
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = normalizedDist * 1.05;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Connect nodes to mouse pointer
+      if (mouse.active && mouse.x !== null && mouse.y !== null) {
+        for (let i = 0; i < nodes.length; i++) {
+          const dx = mouse.x - nodes[i].x;
+          const dy = mouse.y - nodes[i].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouse.radius) {
+            const alpha = (1 - dist / mouse.radius) * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Update and Draw Nodes
+      nodes.forEach((node) => {
+        node.update();
+        node.draw();
+      });
+
+      // Update and Draw Active Signal Pulses
+      for (let i = signals.length - 1; i >= 0; i--) {
+        const sig = signals[i];
+        sig.update();
+        sig.draw();
+        if (sig.progress >= 1) {
+          signals.splice(i, 1);
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearInterval(signalInterval);
+      clearInterval(waveInterval);
+      clearTimeout(resizeTimeout);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("touchend", handleMouseLeave);
+    };
+  }, []);
 
   return (
     <div
-      ref={containerRef}
-      className="absolute inset-0 overflow-hidden pointer-events-none"
       aria-hidden="true"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+        overflow: "hidden",
+        userSelect: "none",
+      }}
     >
-      {/* Deep cinematic base gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#050810] via-[#0b1220] to-[#050510]" />
-
-      {/* Deep space dust — reduced count on mobile */}
-      {mounted &&
-        Array.from({ length: dustCount }).map((_, i) => (
-          <motion.div
-            key={`dust-${i}`}
-            initial={{
-              x: Math.random() * 100 + "%",
-              y: Math.random() * 100 + "%",
-              opacity: 0,
-            }}
-            animate={
-              prefersReduced
-                ? { opacity: 0.2 }
-                : {
-                    y: [null, Math.random() * -50 - 20 + "%"],
-                    opacity: [0, 0.4, 0],
-                  }
-            }
-            transition={{
-              duration: 20 + Math.random() * 20,
-              repeat: prefersReduced ? 0 : Infinity,
-              delay: Math.random() * 10,
-              ease: "linear",
-            }}
-            className="absolute rounded-full will-change-transform"
-            style={{
-              width: Math.random() * 2 + 0.5 + "px",
-              height: Math.random() * 2 + 0.5 + "px",
-              backgroundColor: ["#06b6d4", "#8b5cf6", "#10b981", "#f43f5e"][i % 4],
-              boxShadow: `0 0 4px currentColor`,
-            }}
-          />
-        ))}
-
-      {/* Cinematic vignette */}
+      {/* Deep Navy/Black Background */}
       <div
-        className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.85) 100%)",
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "#020617",
+          pointerEvents: "none",
         }}
       />
 
-      {/* Breathing color blobs — disabled on reduced motion */}
-      {!prefersReduced && (
-        <>
-          <motion.div
-            animate={{
-              scale: [1, 1.4, 1],
-              x: [0, 50, 0],
-              y: [0, -40, 0],
-              opacity: [0.2, 0.35, 0.2],
-            }}
-            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full blur-[140px] will-change-transform"
-            style={{
-              background: "radial-gradient(circle, #06b6d4 0%, transparent 70%)",
-            }}
-          />
-
-          <motion.div
-            animate={{
-              scale: [1.2, 1, 1.2],
-              x: [0, -60, 0],
-              y: [0, 50, 0],
-              opacity: [0.2, 0.35, 0.2],
-            }}
-            transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-[140px] will-change-transform"
-            style={{
-              background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
-            }}
-          />
-
-          <motion.div
-            animate={{
-              scale: [1, 1.3, 1],
-              x: [0, 40, 0],
-              y: [0, -50, 0],
-              opacity: [0.15, 0.3, 0.15],
-            }}
-            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-40 left-1/3 w-[700px] h-[700px] rounded-full blur-[160px] will-change-transform"
-            style={{
-              background: "radial-gradient(circle, #10b981 0%, transparent 70%)",
-            }}
-          />
-        </>
-      )}
-
-      {/* Mouse spotlight + ripple + trail — desktop only, not reduced motion */}
-      {mounted && !isMobile && !prefersReduced && (
-        <>
-          <motion.div
-            animate={{ left: `${mousePos.x}%`, top: `${mousePos.y}%` }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full will-change-transform"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.08) 40%, transparent 70%)",
-            }}
-          />
-
-          <motion.div
-            animate={{
-              left: `${mousePos.x}%`,
-              top: `${mousePos.y}%`,
-              scale: [1, 1.5, 2],
-              opacity: [0.4, 0.15, 0],
-            }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-            className="absolute w-32 h-32 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-400/30"
-          />
-
-          {trail.map((t) => (
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0.9, scale: 1 }}
-              animate={{ opacity: 0, scale: 0.3 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none will-change-transform"
-              style={{
-                left: `${t.x}%`,
-                top: `${t.y}%`,
-                width: "6px",
-                height: "6px",
-                backgroundColor: t.color,
-                boxShadow: `0 0 12px ${t.color}, 0 0 24px ${t.color}60`,
-              }}
-            />
-          ))}
-        </>
-      )}
-
-      {/* SVG Neural Network */}
-      <svg
-        className="absolute inset-0 w-full h-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        <defs>
-          <linearGradient id="lineGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.8" />
-          </linearGradient>
-
-          <linearGradient id="lineGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#10b981" stopOpacity="0.5" />
-          </linearGradient>
-
-          <linearGradient id="lineGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.35" />
-          </linearGradient>
-
-          <filter id="neuralGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="0.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-
-          <filter id="strongGlow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="1" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {mounted &&
-          connections.map((conn, idx) => {
-            const fromNode = nodes.find((n) => n.id === conn.from);
-            const toNode = nodes.find((n) => n.id === conn.to);
-            if (!fromNode || !toNode) return null;
-
-            const gradId = `lineGrad${conn.layer}`;
-            const avgDepth = (fromNode.depth + toNode.depth) / 2;
-            const opacity = avgDepth === 3 ? 0.3 : avgDepth === 2 ? 0.6 : 1;
-
-            return (
-              <g key={idx} style={{ opacity }}>
-                <motion.line
-                  x1={fromNode.x}
-                  y1={fromNode.y}
-                  x2={toNode.x}
-                  y2={toNode.y}
-                  stroke={`url(#${gradId})`}
-                  strokeWidth={conn.weight}
-                  initial={prefersReduced ? false : { pathLength: 0, opacity: 0 }}
-                  animate={prefersReduced ? false : { pathLength: 1, opacity: 1 }}
-                  transition={{
-                    duration: 1.5,
-                    delay: idx * 0.02,
-                    ease: "easeOut",
-                  }}
-                />
-
-                {/* Data pulse — disabled on reduced motion */}
-                {!prefersReduced && (
-                  <motion.circle
-                    r={conn.layer === 1 ? "0.5" : "0.3"}
-                    fill={fromNode.color}
-                    filter="url(#strongGlow)"
-                    initial={{ cx: fromNode.x, cy: fromNode.y, opacity: 0 }}
-                    animate={{
-                      cx: [fromNode.x, toNode.x],
-                      cy: [fromNode.y, toNode.y],
-                      opacity: [0, 1, 1, 0],
-                    }}
-                    transition={{
-                      duration: 2.5 + conn.layer * 0.5,
-                      repeat: Infinity,
-                      delay: idx * 0.3,
-                      ease: "easeInOut",
-                    }}
-                  />
-                )}
-              </g>
-            );
-          })}
-      </svg>
-
-      {/* Nodes with depth of field */}
-      {nodes.map((node, idx) => (
-        <motion.div
-          key={node.id}
-          initial={prefersReduced ? false : { opacity: 0, scale: 0 }}
-          animate={prefersReduced ? false : { opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: idx * 0.04, ease: "easeOut" }}
-          style={{
-            position: "absolute",
-            left: `${node.x}%`,
-            top: `${node.y}%`,
-            transform: "translate(-50%, -50%)",
-            filter:
-              node.depth === 3
-                ? "blur(2px)"
-                : node.depth === 2
-                ? "blur(1px)"
-                : "none",
-            zIndex: 10 - node.depth,
-          }}
-        >
-          {/* Outer halo — disabled on reduced motion */}
-          {!prefersReduced && (
-            <motion.div
-              animate={{
-                scale: [1, 2, 1],
-                opacity: [0.3, 0, 0.3],
-              }}
-              transition={{
-                duration: 3 + (idx % 3),
-                repeat: Infinity,
-                ease: "easeOut",
-              }}
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: node.color,
-                width: `${node.size * 8}px`,
-                height: `${node.size * 8}px`,
-                marginLeft: `${-node.size * 4}px`,
-                marginTop: `${-node.size * 4}px`,
-              }}
-            />
-          )}
-
-          {/* The node dot */}
-          <motion.div
-            animate={
-              prefersReduced
-                ? {}
-                : {
-                    scale: [1, 1.4, 1],
-                    opacity: [0.8, 1, 0.8],
-                  }
-            }
-            transition={{
-              duration: 2 + (idx % 4),
-              repeat: prefersReduced ? 0 : Infinity,
-              ease: "easeInOut",
-            }}
-            className="relative rounded-full"
-            style={{
-              width: `${node.size * 5}px`,
-              height: `${node.size * 5}px`,
-              background: node.color,
-              boxShadow: `0 0 ${node.size * 6}px ${node.color}, 0 0 ${
-                node.size * 12
-              }px ${node.color}80, 0 0 ${node.size * 24}px ${node.color}30`,
-            }}
-          />
-        </motion.div>
-      ))}
-
-      {/* Burst effects — desktop only, not reduced motion */}
-      {mounted && !isMobile && !prefersReduced && burstNodes.map((burst) => (
-        <motion.div
-          key={burst.id}
-          initial={{
-            left: `${burst.x}%`,
-            top: `${burst.y}%`,
-            width: "10px",
-            height: "10px",
-            opacity: 0.9,
-          }}
-          animate={{ width: "120px", height: "120px", opacity: 0 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 will-change-transform"
-          style={{
-            borderColor: burst.color,
-            boxShadow: `0 0 30px ${burst.color}, inset 0 0 20px ${burst.color}40`,
-          }}
-        />
-      ))}
-
-      {/* Anamorphic light streaks — disabled on reduced motion */}
-      {!prefersReduced && (
-        <>
-          <motion.div
-            animate={{
-              x: ["-100%", "200%"],
-              opacity: [0, 0.6, 0],
-            }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[20%] left-0 w-96 h-[2px] pointer-events-none will-change-transform"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, #06b6d4, #8b5cf6, #06b6d4, transparent)",
-              boxShadow: "0 0 20px #06b6d4, 0 0 40px #06b6d4",
-            }}
-          />
-
-          <motion.div
-            animate={{
-              x: ["200%", "-100%"],
-              opacity: [0, 0.5, 0],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              delay: 2,
-              ease: "easeInOut",
-            }}
-            className="absolute top-[60%] left-0 w-80 h-[2px] pointer-events-none will-change-transform"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, #8b5cf6, #f43f5e, #8b5cf6, transparent)",
-              boxShadow: "0 0 20px #8b5cf6, 0 0 40px #8b5cf6",
-            }}
-          />
-
-          <motion.div
-            animate={{
-              x: ["-100%", "200%"],
-              opacity: [0, 0.4, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              delay: 5,
-              ease: "easeInOut",
-            }}
-            className="absolute top-[80%] left-0 w-72 h-[1px] pointer-events-none will-change-transform"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, #10b981, #06b6d4, #10b981, transparent)",
-              boxShadow: "0 0 15px #10b981",
-            }}
-          />
-
-          {/* Cinematic scanline */}
-          <motion.div
-            animate={{ y: ["-100%", "200%"] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-24 opacity-[0.08] will-change-transform"
-            style={{
-              background:
-                "linear-gradient(180deg, transparent, rgba(6, 182, 212, 0.6), transparent)",
-            }}
-          />
-        </>
-      )}
-
-      {/* Subtle grid */}
+      {/* Atmospheric Glow Highlights */}
       <div
-        className="absolute inset-0 opacity-[0.025]"
         style={{
-          backgroundImage: `
-            linear-gradient(rgba(6, 182, 212, 0.6) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139, 92, 246, 0.6) 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
+          position: "absolute",
+          top: "-120px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "850px",
+          height: "450px",
+          background: "radial-gradient(circle, rgba(6,182,212,0.12) 0%, rgba(2,6,23,0) 70%)",
+          filter: "blur(110px)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "35%",
+          left: "-120px",
+          width: "550px",
+          height: "350px",
+          background: "radial-gradient(circle, rgba(99,102,241,0.09) 0%, rgba(2,6,23,0) 70%)",
+          filter: "blur(120px)",
+          pointerEvents: "none",
         }}
       />
 
-      {/* Corner rays — disabled on reduced motion */}
-      {!prefersReduced && (
-        <>
-          <motion.div
-            animate={{ opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity }}
-            className="absolute top-0 left-0 w-[500px] h-[500px] pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(circle at top left, rgba(6, 182, 212, 0.4) 0%, transparent 70%)",
-            }}
-          />
-
-          <motion.div
-            animate={{ opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity, delay: 4 }}
-            className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(circle at top right, rgba(139, 92, 246, 0.4) 0%, transparent 70%)",
-            }}
-          />
-        </>
-      )}
-
-      {/* Film grain overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+      {/* High-Performance Canvas */}
+      <canvas
+        ref={canvasRef}
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' /%3E%3C/svg%3E")`,
+          position: "absolute",
+          inset: 0,
+          display: "block",
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Radial Vignette */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "radial-gradient(circle at center, transparent 0%, rgba(2,6,23,0.65) 100%)",
+          pointerEvents: "none",
         }}
       />
     </div>

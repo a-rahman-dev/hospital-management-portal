@@ -1,414 +1,322 @@
-import { memo, useCallback } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
+  HeartPulse,
   Activity,
+  ShieldCheck,
+  ArrowUp,
   Mail,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
+  ChevronRight,
   Phone,
   MapPin,
-  Globe,
-  MessageCircle,
-  Send,
-  Camera,
-  Play as PlayIcon,
-  ArrowUpRight,
-  Heart,
-  Shield,
+  Clock,
+  Radio,
+  FileText,
+  Lock,
+  Stethoscope,
+  Building2,
+  Zap,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-/* ============================================================
-   🎨 FOOTER (Rule 5)
-   ─────────────────────────────────────────────
-   Palette: Cyan → Violet → Blue (brand)
-   ============================================================ */
-
-/* ============================================================
-   🎯 FOOTER LINKS (Rule 3)
-   ============================================================ */
-const footerLinks = {
-  Portal: [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Patients", path: "/patients" },
-    { name: "Appointments", path: "/patients/appointments" },
-    { name: "Lab Reports", path: "/patients/lab-reports" },
-  ],
-  Modules: [
-    { name: "ICD Codes", path: "/icd" },
-    { name: "OBGYN Diagnosis", path: "/obgyn" },
-    { name: "Procedures", path: "/procedures" },
-    { name: "Billing", path: "/patients/billing" },
-  ],
-  Administration: [
-    { name: "Providers", path: "/providers" },
-    { name: "Facilities", path: "/facilities" },
-    { name: "Users", path: "/users" },
-    { name: "Insurance", path: "/insurance" },
-  ],
-  System: [
-    { name: "Practice Setting", path: "/practice-setting" },
-    { name: "Practices", path: "/practices" },
-    { name: "Module Management", path: "/modules" },
-    { name: "Permissions", path: "/modules/permissions" },
-  ],
-};
-
-/* ============================================================
-   🎯 SOCIAL LINKS (Rule 3 — with real URLs)
-   ============================================================ */
-const socials = [
-  {
-    id: 1,
-    icon: Globe,
-    href: "https://facebook.com/ayinternationalhospital",
-    label: "Facebook",
-    color: "#1877f2",
-  },
-  {
-    id: 2,
-    icon: MessageCircle,
-    href: "https://twitter.com/ayinthospital",
-    label: "Twitter",
-    color: "#1da1f2",
-  },
-  {
-    id: 3,
-    icon: Send,
-    href: "https://linkedin.com/company/ay-international-hospital",
-    label: "LinkedIn",
-    color: "#0a66c2",
-  },
-  {
-    id: 4,
-    icon: Camera,
-    href: "https://instagram.com/ayinternationalhospital",
-    label: "Instagram",
-    color: "#e4405f",
-  },
-  {
-    id: 5,
-    icon: PlayIcon,
-    href: "https://youtube.com/@ayinternationalhospital",
-    label: "YouTube",
-    color: "#ff0000",
-  },
-];
-
-/* ============================================================
-   🎯 CONTACT INFO (Rule 3)
-   ============================================================ */
-const contactInfo = [
-  {
-    id: 1,
-    icon: Mail,
-    label: "contact@ayint-hospital.com",
-    href: "mailto:contact@ayint-hospital.com",
-    external: false,
-  },
-  {
-    id: 2,
-    icon: Phone,
-    label: "+1 (555) 100-2000",
-    href: "tel:+15551002000",
-    external: false,
-  },
-  {
-    id: 3,
-    icon: MapPin,
-    label: "450 Medical Center Drive, Boston, MA 02115",
-    href: "https://maps.google.com/?q=450+Medical+Center+Drive+Boston+MA+02115",
-    external: true,
-  },
-];
-
-/* ============================================================
-   🎯 LEGAL LINKS (Rule 3)
-   ============================================================ */
-const legalLinks = [
-  { name: "Privacy Policy", path: "/privacy" },
-  { name: "Terms of Service", path: "/terms" },
-  { name: "HIPAA Notice", path: "/hipaa" },
-];
-
-/* ============================================================
-   🎯 SOCIAL ICON (memoized)
-   ============================================================ */
-const SocialIcon = memo(function SocialIcon({ social }) {
-  const Icon = social.icon;
-  const prefersReduced = useReducedMotion();
-
-  return (
-    <motion.a
-      href={social.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      whileHover={prefersReduced ? {} : { y: -3, scale: 1.1 }}
-      whileTap={prefersReduced ? {} : { scale: 0.95 }}
-      className={cn(
-        "group relative w-10 h-10 min-w-[40px] min-h-[40px] sm:w-9 sm:h-9 sm:min-w-0 sm:min-h-0",
-        "rounded-xl bg-white/[0.03] border border-white/[0.08]",
-        "flex items-center justify-center",
-        "hover:bg-white/[0.06] hover:border-white/[0.15]",
-        "transition-all duration-200",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40"
-      )}
-      aria-label={`Visit our ${social.label} page`}
-    >
-      <Icon
-        size={15}
-        className="text-slate-400 group-hover:text-white transition-colors"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 blur-md transition-opacity pointer-events-none"
-        style={{ background: social.color }}
-        aria-hidden="true"
-      />
-    </motion.a>
-  );
-});
-
-/* ============================================================
-   🎯 MAIN: Footer
-   ============================================================ */
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-  const prefersReduced = useReducedMotion();
+  const navigate = useNavigate();
 
-  /* ============================================================
-     🎯 HANDLE EXTERNAL CONTACT
-     ============================================================ */
-  const handleContactClick = useCallback((info) => {
-    if (info.external) {
-      window.open(info.href, "_blank", "noopener,noreferrer");
+  // Functional Newsletter State
+  const [emailInput, setEmailInput] = useState("");
+  const [subscriptionState, setSubscriptionState] = useState("idle"); // 'idle' | 'loading' | 'success'
+  const [subscribeMessage, setSubscribeMessage] = useState("");
+
+  // Smooth Scroll To Top Handler
+  const scrollToTop = () => {
+    const scrollContainer = document.querySelector(".overflow-y-auto");
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, []);
+  };
+
+  // Subscription Form Submission (Rule 2: Every Button Works)
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!emailInput || !emailInput.includes("@")) {
+      setSubscriptionState("error");
+      setSubscribeMessage("Please enter a valid clinical institutional email address.");
+      setTimeout(() => setSubscriptionState("idle"), 3500);
+      return;
+    }
+
+    setSubscriptionState("loading");
+    setTimeout(() => {
+      setSubscriptionState("success");
+      setSubscribeMessage("Subscribed to AY Clinical Dispatch & Telemetry Bulletins.");
+      setEmailInput("");
+      setTimeout(() => setSubscriptionState("idle"), 4000);
+    }, 700);
+  };
 
   return (
-    <footer className="relative bg-[#080d18] overflow-hidden">
-      {/* Top divider */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"
-        aria-hidden="true"
-      />
+    <footer className="relative w-full bg-[#050A14] text-slate-100 border-t border-slate-800/80 pt-16 pb-12 select-none overflow-hidden">
+      
+      {/* Background Soft Glow matching Dashboard Palette */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[250px] bg-gradient-to-t from-violet-600/10 via-indigo-600/5 to-transparent rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Ambient orb — disabled on reduced motion */}
-      {!prefersReduced && (
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.1, 0.15, 0.1],
-          }}
-          transition={{ duration: 15, repeat: Infinity }}
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] will-change-transform"
-          style={{
-            background: "radial-gradient(circle, #06b6d4 0%, transparent 70%)",
-          }}
-          aria-hidden="true"
-        />
-      )}
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ============================================================
-            MAIN GRID
-           ============================================================ */}
-        <div className="py-12 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
-          {/* ============================================================
-              BRAND COLUMN
-             ============================================================ */}
-          <div className="lg:col-span-4">
-            <motion.div
-              initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-              whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Brand */}
-              <div className="flex items-center gap-3 mb-5">
-                <div className="relative shrink-0">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-cyan-500 via-violet-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/40">
-                    <Activity size={22} className="text-white" strokeWidth={2.5} aria-hidden="true" />
-                  </div>
-                  <span
-                    className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-[#080d18]"
-                    aria-label="Online"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm sm:text-base font-black tracking-tight text-white leading-tight truncate">
-                    AY INTERNATIONAL
-                  </h3>
-                  <p className="text-[10px] font-bold text-cyan-400 tracking-[0.2em] uppercase leading-tight">
-                    Hospital
-                  </p>
-                </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+        
+        {/* ========================================================
+            1. TOP CALLOUT / EMERGENCY HOTLINE BAR
+           ======================================================== */}
+        <div className="rounded-3xl bg-[#0B1220] border border-slate-800/90 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center gap-4 text-center md:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-rose-400 flex items-center justify-center shrink-0">
+              <Phone size={22} className="animate-pulse" />
+            </div>
+            <div>
+              <div className="text-xs font-mono font-bold uppercase tracking-wider text-rose-400 flex items-center justify-center md:justify-start gap-2">
+                <span>AY Acute Emergency Hotline</span>
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
               </div>
-
-              {/* Description */}
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
-                Intelligent hospital management system powering patient care,
-                diagnostics, and revenue cycles for 500+ healthcare providers
-                worldwide.
-              </p>
-
-              {/* Certifications */}
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <Shield
-                    size={11}
-                    className="text-emerald-400"
-                    aria-hidden="true"
-                  />
-                  <span className="text-[9px] font-bold text-emerald-400 tracking-wider uppercase">
-                    HIPAA
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                  <span className="text-[9px] font-bold text-cyan-400 tracking-wider uppercase">
-                    JCI
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20">
-                  <span className="text-[9px] font-bold text-violet-400 tracking-wider uppercase">
-                    ISO 9001
-                  </span>
-                </div>
-              </div>
-
-              {/* Social icons */}
-              <div className="flex items-center gap-2">
-                {socials.map((social) => (
-                  <SocialIcon key={social.id} social={social} />
-                ))}
-              </div>
-            </motion.div>
+              <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">
+                +92 (51) 844-9000 <span className="text-slate-500 font-normal text-sm">/ Toll-Free Extension 1122</span>
+              </h4>
+            </div>
           </div>
 
-          {/* ============================================================
-              LINK COLUMNS
-             ============================================================ */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
-            {Object.entries(footerLinks).map(([title, links], colIdx) => (
-              <motion.div
-                key={title}
-                initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-                whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: colIdx * 0.1 }}
-              >
-                <h4 className="text-[10px] font-black text-white tracking-[0.15em] uppercase mb-4">
-                  {title}
-                </h4>
-                <ul className="space-y-2.5">
-                  {links.map((link) => (
-                    <li key={link.path}>
-                      <Link
-                        to={link.path}
-                        className="group inline-flex items-center gap-1 text-xs text-slate-400 hover:text-cyan-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 rounded"
-                      >
-                        <span>{link.name}</span>
-                        <ArrowUpRight
-                          size={10}
-                          className={cn(
-                            "opacity-0 group-hover:opacity-100",
-                            !prefersReduced &&
-                              "transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                          )}
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard")}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-violet-500/25 transition cursor-pointer border border-white/20"
+            >
+              <Activity size={15} />
+              <span>Direct Telemetry Portal</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="p-2.5 rounded-xl bg-[#070D1B] hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+              title="Return to top"
+            >
+              <ArrowUp size={16} />
+            </button>
           </div>
         </div>
 
-        {/* ============================================================
-            CONTACT STRIP
-           ============================================================ */}
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-          whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="py-5 sm:py-6 border-t border-white/[0.06] flex flex-wrap items-center justify-center gap-3 sm:gap-6"
-        >
-          {contactInfo.map((info) => {
-            const Icon = info.icon;
-            return (
-              <a
-                key={info.id}
-                href={info.href}
-                onClick={() => handleContactClick(info)}
-                target={info.external ? "_blank" : undefined}
-                rel={info.external ? "noopener noreferrer" : undefined}
-                className="group flex items-center gap-2 text-xs text-slate-400 hover:text-cyan-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 rounded"
-              >
-                <div className="w-7 h-7 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-center justify-center group-hover:border-cyan-500/30 transition-colors shrink-0">
-                  <Icon
-                    size={12}
-                    className="text-slate-500 group-hover:text-cyan-400 transition-colors"
-                    aria-hidden="true"
-                  />
-                </div>
-                <span className="truncate">{info.label}</span>
-              </a>
-            );
-          })}
-        </motion.div>
+        {/* ========================================================
+            2. MAIN 4-COLUMN FOOTER NAVIGATION
+           ======================================================== */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pt-4">
+          
+          {/* Column 1 & 2: Hospital Suite Brand & Compliance (Span 2) */}
+          <div className="lg:col-span-2 space-y-5">
+            <Link to="/dashboard" className="flex items-center gap-3 group inline-flex">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center text-white font-black shadow-lg shadow-violet-500/30 border border-white/20 transition-transform group-hover:scale-105">
+                <HeartPulse size={22} className="stroke-[2.5]" />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-base font-black tracking-wider text-white flex items-center gap-2">
+                  AY INT.<span className="text-violet-400 font-extrabold">PRO</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/30">
+                    SUITE
+                  </span>
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  Autonomous Clinical Operating Architecture
+                </span>
+              </div>
+            </Link>
 
-        {/* ============================================================
-            BOTTOM BAR
-           ============================================================ */}
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0 }}
-          whileInView={prefersReduced ? false : { opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="py-5 sm:py-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4"
-        >
-          {/* Copyright */}
-          <p className="text-[11px] text-slate-500 text-center sm:text-left">
-            © {currentYear} AY International Hospital. All rights reserved.
-          </p>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm font-normal">
+              AY International Hospital operates high-velocity acute care telemetry, predictive surgical scheduling, and electronic health record reconciliation under ISO-27001 and JCI standards.
+            </p>
 
-          {/* Legal links */}
-          <div className="flex items-center gap-3 sm:gap-4 text-[11px] text-slate-500 flex-wrap justify-center">
-            {legalLinks.map((link, idx) => (
-              <span key={link.path} className="flex items-center gap-3 sm:gap-4">
-                <Link
-                  to={link.path}
-                  className="hover:text-cyan-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 rounded"
-                >
-                  {link.name}
+            {/* Live Operational Status Strip */}
+            <div className="p-3.5 rounded-2xl bg-[#0B1220] border border-slate-800/80 space-y-2 max-w-sm">
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <span className="text-slate-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Primary Edge Node: AP-1
+                </span>
+                <span className="text-emerald-400 font-bold">ONLINE</span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-800/60">
+                <span>Telemetry Ingestion: 0.38ms</span>
+                <span>FHIR R4 Nominal</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3: Clinical Modules Navigation */}
+          <div className="space-y-4">
+            <h5 className="text-xs font-mono font-bold uppercase tracking-wider text-white">
+              Clinical Modules
+            </h5>
+            <ul className="space-y-2.5 text-xs">
+              <li>
+                <Link to="/patients" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Inpatient EMR Hub</span>
                 </Link>
-                {idx < legalLinks.length - 1 && (
-                  <span
-                    className="w-px h-3 bg-white/[0.1]"
-                    aria-hidden="true"
-                  />
-                )}
-              </span>
-            ))}
+              </li>
+              <li>
+                <Link to="/patients/appointments" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>OPD & Ward Scheduler</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/patients/lab-reports" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Telemetry & Lab Feeds</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/icd" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>ICD-10 Diagnostic Engine</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/procedures" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Surgical Operating Theaters</span>
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* Made with love */}
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-            <span>Made with</span>
-            <Heart
-              size={11}
-              className={cn(
-                "text-rose-500 fill-rose-500",
-                !prefersReduced && "animate-pulse"
-              )}
-              aria-hidden="true"
-            />
-            <span>in Boston</span>
+          {/* Column 4: Governance & Facilities */}
+          <div className="space-y-4">
+            <h5 className="text-xs font-mono font-bold uppercase tracking-wider text-white">
+              Governance & Admin
+            </h5>
+            <ul className="space-y-2.5 text-xs">
+              <li>
+                <Link to="/facilities" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Acute ICU Bed Matrix</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/practices" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Specialist Practice Roster</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/insurance" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Revenue Cycle & Claims</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/practice-setting" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Security & Access Control</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className="text-slate-400 hover:text-violet-400 transition flex items-center gap-1.5">
+                  <ChevronRight size={13} className="text-slate-600" />
+                  <span>Clinical Command Hub</span>
+                </Link>
+              </li>
+            </ul>
           </div>
-        </motion.div>
+
+          {/* Column 5: Telemetry Alerts & Institutional Dispatch Form */}
+          <div className="space-y-4">
+            <h5 className="text-xs font-mono font-bold uppercase tracking-wider text-white">
+              Clinical Advisory Feed
+            </h5>
+            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+              Receive automated notifications regarding hospital system updates, ICD schema revisions, and drug interaction advisories.
+            </p>
+
+            {/* Newsletter Subscription Form */}
+            <form onSubmit={handleSubscribe} className="space-y-2">
+              <div className="relative">
+                <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="physician@hospital.org"
+                  className="w-full bg-[#0B1220] border border-slate-800 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-violet-500/60 transition"
+                />
+                <button
+                  type="submit"
+                  disabled={subscriptionState === "loading"}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition cursor-pointer"
+                >
+                  <Send size={13} />
+                </button>
+              </div>
+
+              {/* Feedback Alert */}
+              <AnimatePresence>
+                {subscriptionState === "success" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-[11px] flex items-center gap-1.5"
+                  >
+                    <CheckCircle2 size={13} className="shrink-0" />
+                    <span>{subscribeMessage}</span>
+                  </motion.div>
+                )}
+
+                {subscriptionState === "error" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="p-2.5 rounded-xl bg-rose-950/30 border border-rose-500/40 text-rose-300 text-[11px] flex items-center gap-1.5"
+                  >
+                    <AlertCircle size={13} className="shrink-0" />
+                    <span>{subscribeMessage}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </form>
+          </div>
+
+        </div>
+
+        {/* ========================================================
+            3. REGULATORY ACCREDITATION & BOTTOM BAR
+           ======================================================== */}
+        <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
+          
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+            <span className="flex items-center gap-1 text-slate-400">
+              <ShieldCheck size={14} className="text-violet-400" />
+              HIPAA & HITECH Enforced
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1 text-slate-400">
+              <Lock size={13} className="text-emerald-400" />
+              AES-256 Cloud Encryption
+            </span>
+            <span>•</span>
+            <span className="text-slate-400">JCI International Standard</span>
+          </div>
+
+          <div className="text-center md:text-right text-slate-400">
+            © 2026 AY International Hospital Suite. All clinical rights reserved.
+          </div>
+
+        </div>
+
       </div>
+
     </footer>
   );
 }

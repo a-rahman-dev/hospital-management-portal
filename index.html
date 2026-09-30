@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
     <meta name="color-scheme" content="dark light" />
 
@@ -16,34 +16,47 @@
     <meta name="author" content="AY International Hospital" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Favicon (only SVG — no PNG required) -->
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Preconnect -->
+    <!-- Google Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Fonts -->
+    <!-- Typography -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Inline Critical CSS -->
+    <!-- Baseline Global Layout CSS -->
     <style>
-      html,
+      html {
+        width: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 0;
         padding: 0;
-        background-color: #0b1220;
+        width: 100%;
+        min-height: 100%;
+        background-color: #020617;
         color: #f1f5f9;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", Roboto, sans-serif;
-        overscroll-behavior: none;
-        min-height: 100vh;
-        min-height: 100dvh;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        overflow-y: visible;
+      }
+
+      #root {
+        width: 100%;
+        min-height: 100%;
+        position: relative;
       }
 
       @media (prefers-color-scheme: light) {
@@ -54,108 +67,29 @@
       }
 
       html.dark body {
-        background-color: #0b1220;
+        background-color: #020617;
         color: #f1f5f9;
       }
     </style>
   </head>
 
   <body>
-    <!-- React Root -->
+    <!-- React Root Entry -->
     <div id="root"></div>
 
-    <!-- Noscript Fallback -->
+    <!-- Noscript Fallback with proper tag closing -->
     <noscript>
-      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; font-family: system-ui; text-align: center; background: #0b1220; color: #f1f5f9;">
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; font-family: system-ui; text-align: center; background: #020617; color: #f1f5f9;">
         <div>
           <h1 style="font-size: 1.5rem; margin-bottom: 1rem;">JavaScript Required</h1>
           <p style="color: #94a3b8; max-width: 400px;">
             AY Int. Hospital Portal requires JavaScript to run. Please enable JavaScript in your browser.
           </p>
         </div>
-      </noscript>
+      </div>
+    </noscript>
 
-    <!-- Entry Point -->
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html><!doctype html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
-    <meta name="color-scheme" content="dark light" />
-
-    <title>AY Int. Hospital — Patient Portal & Management System</title>
-
-    <meta
-      name="description"
-      content="Intelligent hospital management system for patient care, appointments, diagnostics, and revenue cycles. HIPAA compliant, JCI accredited."
-    />
-    <meta name="author" content="AY International Hospital" />
-    <meta name="robots" content="index, follow" />
-
-    <!-- Favicon (only SVG — no PNG required) -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Inline Critical CSS -->
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #0b1220;
-        color: #f1f5f9;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", Roboto, sans-serif;
-        overscroll-behavior: none;
-        min-height: 100vh;
-        min-height: 100dvh;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-
-      @media (prefers-color-scheme: light) {
-        html:not(.dark) body {
-          background-color: #f8fafc;
-          color: #0f172a;
-        }
-      }
-
-      html.dark body {
-        background-color: #0b1220;
-        color: #f1f5f9;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- React Root -->
-    <div id="root"></div>
-
-    <!-- Noscript Fallback -->
-    <noscript>
-      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; font-family: system-ui; text-align: center; background: #0b1220; color: #f1f5f9;">
-        <div>
-          <h1 style="font-size: 1.5rem; margin-bottom: 1rem;">JavaScript Required</h1>
-          <p style="color: #94a3b8; max-width: 400px;">
-            AY Int. Hospital Portal requires JavaScript to run. Please enable JavaScript in your browser.
-          </p>
-        </div>
-      </noscript>
-
-    <!-- Entry Point -->
+    <!-- Main Entry Module -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

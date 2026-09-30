@@ -1,291 +1,285 @@
-import { memo, useCallback } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
-  Sparkles,
   Activity,
-  Shield,
-  Clock,
-  Users,
-  TrendingUp,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  Terminal,
+  Server,
+  Lock,
+  CheckCircle2,
+  Cpu,
+  Layers,
+  Sparkles,
+  Radio,
+  Copy,
+  Check,
+  RefreshCw,
+  ExternalLink,
+  ChevronRight,
+  X,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-/* ============================================================
-   🎨 CTA SECTION (Rule 5)
-   ─────────────────────────────────────────────
-   Palette: Cyan → Violet → Blue (brand)
-   ============================================================ */
-
-/* ============================================================
-   🎯 BENEFITS DATA (Rule 3)
-   ============================================================ */
-const benefits = [
-  {
-    id: 1,
-    icon: Clock,
-    label: "Save 40% Time",
-    color: "#06b6d4",
-    glow: "rgba(6, 182, 212, 0.35)",
-  },
-  {
-    id: 2,
-    icon: Users,
-    label: "10,000+ Patients",
-    color: "#10b981",
-    glow: "rgba(16, 185, 129, 0.35)",
-  },
-  {
-    id: 3,
-    icon: TrendingUp,
-    label: "Boost Revenue 25%",
-    color: "#8b5cf6",
-    glow: "rgba(139, 92, 246, 0.35)",
-  },
-  {
-    id: 4,
-    icon: Shield,
-    label: "HIPAA Compliant",
-    color: "#f59e0b",
-    glow: "rgba(245, 158, 11, 0.35)",
-  },
-];
-
-/* ============================================================
-   🎯 BENEFIT CARD (memoized)
-   ============================================================ */
-const BenefitCard = memo(function BenefitCard({ benefit, index }) {
-  const Icon = benefit.icon;
-  const prefersReduced = useReducedMotion();
-
-  return (
-    <motion.div
-      initial={prefersReduced ? false : { opacity: 0, scale: 0.9 }}
-      whileInView={prefersReduced ? false : { opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
-      whileHover={prefersReduced ? {} : { y: -4, scale: 1.05 }}
-      className="group flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 cursor-default"
-    >
-      <div
-        className={cn(
-          "w-10 h-10 rounded-xl flex items-center justify-center",
-          !prefersReduced &&
-            "transition-transform duration-300 group-hover:scale-110"
-        )}
-        style={{
-          background: `linear-gradient(135deg, ${benefit.color}40, ${benefit.color}20)`,
-          border: `1px solid ${benefit.color}40`,
-          boxShadow: `0 8px 20px ${benefit.glow}`,
-        }}
-      >
-        <Icon
-          size={16}
-          style={{ color: benefit.color }}
-          strokeWidth={2.5}
-          aria-hidden="true"
-        />
-      </div>
-      <span className="text-[10px] font-bold text-slate-300 tracking-wider uppercase text-center leading-tight">
-        {benefit.label}
-      </span>
-    </motion.div>
-  );
-});
-
-/* ============================================================
-   🎯 MAIN: CTA
-   ============================================================ */
 export default function CTA() {
   const navigate = useNavigate();
-  const prefersReduced = useReducedMotion();
 
-  /* ============================================================
-     🎯 HANDLERS
-     ============================================================ */
-  const handleEnterPortal = useCallback(() => {
-    navigate("/dashboard");
-  }, [navigate]);
+  // Functional Interactive State
+  const [clusterNode, setClusterNode] = useState("ay-core-node-01");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deploymentSuccess, setDeploymentSuccess] = useState(false);
+  const [showTerminalModal, setShowTerminalModal] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
 
-  const handleContactSales = useCallback(() => {
-    window.open(
-      "https://ayint-hospital.com",
-      "_blank",
-      "noopener,noreferrer"
-    );
-  }, []);
+  const sampleApiKey = "ay_live_sec_9941_fhir_r4_00x8f2a";
+
+  const handleCopyApiKey = () => {
+    navigator.clipboard.writeText(sampleApiKey);
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2200);
+  };
+
+  const handleSimulateDeployment = (e) => {
+    e.preventDefault();
+    setIsDeploying(true);
+    setDeploymentSuccess(false);
+
+    setTimeout(() => {
+      setIsDeploying(false);
+      setDeploymentSuccess(true);
+      setShowTerminalModal(true);
+    }, 900);
+  };
 
   return (
-    <section className="relative py-16 sm:py-24 bg-[#0b1220] overflow-hidden">
-      {/* Big gradient background — disabled on reduced motion */}
-      {!prefersReduced && (
-        <div className="absolute inset-0 opacity-30">
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 45, 0],
-            }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[600px] sm:h-[900px] rounded-full blur-[100px] sm:blur-[150px] will-change-transform"
-            style={{
-              background:
-                "conic-gradient(from 0deg, #06b6d4, #8b5cf6, #0284c7, #06b6d4)",
-            }}
-            aria-hidden="true"
-          />
-        </div>
-      )}
+    <section className="relative w-full py-16 sm:py-28 bg-[#070D1B] text-slate-100 select-none overflow-hidden border-t border-slate-800/80">
+      
+      {/* Background Soft Glow Spheres */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-violet-600/15 via-indigo-600/10 to-fuchsia-500/10 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Static gradient fallback for reduced motion */}
-      {prefersReduced && (
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            background:
-              "radial-gradient(circle at center, #06b6d4 0%, transparent 70%)",
-          }}
-          aria-hidden="true"
-        />
-      )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+        
+        {/* Main Glassmorphic Command Box */}
+        <div className="relative rounded-[32px] bg-gradient-to-b from-[#0B1220] to-[#070D1B] border border-slate-800/90 p-8 sm:p-12 lg:p-16 shadow-2xl overflow-hidden backdrop-blur-2xl">
+          
+          {/* Subtle Top Glowing Line */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-50" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ============================================================
-            MAIN CTA CARD
-           ============================================================ */}
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0, y: 40, scale: 0.95 }}
-          whileInView={prefersReduced ? false : { opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="relative"
-        >
-          {/* Outer glow — hidden on mobile (perf) */}
-          <div className="hidden sm:block absolute -inset-2 rounded-[32px] bg-gradient-to-r from-cyan-500/30 via-violet-500/30 to-blue-500/30 blur-2xl" />
-
-          {/* Card */}
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-2xl border border-white/[0.1] p-5 sm:p-8 lg:p-16">
-            {/* Decorative corner accents */}
-            <div
-              className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-cyan-500/20 to-transparent blur-3xl pointer-events-none"
-              aria-hidden="true"
-            />
-            <div
-              className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-violet-500/20 to-transparent blur-3xl pointer-events-none"
-              aria-hidden="true"
-            />
-
-            {/* Content */}
-            <div className="relative z-10 text-center max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            
+            {/* Left Column: Mission Call & Deployment Parameters (7 Cols) */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              
               {/* Badge */}
-              <motion.div
-                initial={prefersReduced ? false : { opacity: 0, scale: 0.9 }}
-                whileInView={prefersReduced ? false : { opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.1] backdrop-blur-sm mb-6"
-              >
-                <Sparkles size={14} className="text-cyan-400" aria-hidden="true" />
-                <span className="text-[11px] font-bold text-slate-300 tracking-[0.15em] uppercase">
-                  Ready to Transform
-                </span>
-                <span
-                  className={cn(
-                    "w-1.5 h-1.5 rounded-full bg-emerald-500",
-                    !prefersReduced && "animate-pulse"
-                  )}
-                  aria-hidden="true"
-                />
-              </motion.div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-xs font-mono font-bold text-violet-400">
+                <Radio size={14} className="animate-pulse" />
+                ENTERPRISE HOSPITAL CLOUD // DEPLOYMENT SUITE
+              </div>
 
-              {/* Heading */}
-              <motion.h2
-                initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-                whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight mb-6"
-              >
-                Experience the Future of{" "}
-                <span className="bg-gradient-to-r from-cyan-400 via-violet-400 to-blue-500 bg-clip-text text-transparent">
-                  Hospital Management
-                </span>
-              </motion.h2>
+              {/* Title */}
+              <h2 className="text-3xl sm:text-5xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
+                Launch High-Performance{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-fuchsia-400">
+                  Clinical Intelligence
+                </span>{" "}
+                Today.
+              </h2>
 
-              {/* Description */}
-              <motion.p
-                initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-                whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-sm sm:text-base text-slate-300 leading-relaxed mb-8 max-w-xl mx-auto"
-              >
-                Join 500+ healthcare providers already using AY International
-                Hospital's intelligent platform to streamline operations and
-                deliver exceptional patient care.
-              </motion.p>
+              <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                Deploy real-time ICU telemetry, predictive Grok triage models, and automated inpatient revenue cycles with zero cold-boot latency.
+              </p>
 
-              {/* ============================================================
-                  CTA BUTTONS
-                 ============================================================ */}
-              <motion.div
-                initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-                whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10"
-              >
-                {/* Primary CTA */}
-                <button
-                  onClick={handleEnterPortal}
-                  aria-label="Enter the hospital portal"
-                  className="group relative w-full sm:w-auto flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[52px] rounded-2xl bg-gradient-to-r from-cyan-500 via-violet-500 to-blue-600 text-white font-bold shadow-2xl shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105 active:scale-95 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
-                >
-                  <span
-                    className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-                    aria-hidden="true"
-                  />
-                  <Activity size={18} className="relative z-10" aria-hidden="true" />
-                  <span className="relative z-10">Enter Portal Now</span>
-                  <ArrowRight
-                    size={18}
-                    className={cn(
-                      "relative z-10",
-                      !prefersReduced &&
-                        "transition-transform group-hover:translate-x-1"
+              {/* Interactive Deployment Form */}
+              <form onSubmit={handleSimulateDeployment} className="space-y-4 max-w-lg mx-auto lg:mx-0 pt-2">
+                <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                  <div className="relative w-full">
+                    <Server size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <input
+                      type="text"
+                      value={clusterNode}
+                      onChange={(e) => setClusterNode(e.target.value)}
+                      placeholder="Enter Clinical Node ID..."
+                      className="w-full bg-[#070D1B] border border-slate-800 rounded-2xl pl-10 pr-4 py-3.5 text-xs font-mono text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-violet-500/60 transition"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isDeploying}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 hover:opacity-95 text-white font-bold text-xs shadow-xl shadow-violet-500/25 transition-all duration-200 shrink-0 cursor-pointer border border-white/20 transform hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    {isDeploying ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>Deploying...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={14} className="stroke-[2.5]" />
+                        <span>Launch Sandbox</span>
+                      </>
                     )}
-                    aria-hidden="true"
-                  />
-                </button>
+                  </button>
+                </div>
 
-                {/* Secondary CTA */}
-                <button
-                  onClick={handleContactSales}
-                  aria-label="Contact sales team"
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[52px] rounded-2xl bg-white/[0.05] border border-white/[0.15] text-white font-bold hover:bg-white/[0.1] hover:border-white/[0.25] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
-                >
-                  Contact Sales
-                </button>
-              </motion.div>
+                {/* Sub-text security assurance */}
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-[11px] font-mono text-slate-400 pt-1">
+                  <span className="flex items-center gap-1.5 text-emerald-400">
+                    <ShieldCheck size={14} />
+                    AES-256 Bit Encryption
+                  </span>
+                  <span className="text-slate-600">•</span>
+                  <span>JCI & HIPAA Compliant</span>
+                  <span className="text-slate-600">•</span>
+                  <span>Zero Data Retention Risk</span>
+                </div>
+              </form>
 
-              {/* ============================================================
-                  BENEFITS GRID
-                 ============================================================ */}
-              <motion.div
-                initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-                whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-6 sm:pt-8 border-t border-white/[0.08]"
-              >
-                {benefits.map((benefit, idx) => (
-                  <BenefitCard key={benefit.id} benefit={benefit} index={idx} />
-                ))}
-              </motion.div>
             </div>
+
+            {/* Right Column: Live Node Status & Direct Console Box (5 Cols) */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-3xl bg-[#090F1F] border border-slate-800 p-6 shadow-2xl space-y-5">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs font-mono">
+                  <span className="font-bold text-slate-300 flex items-center gap-2">
+                    <Terminal size={14} className="text-violet-400" />
+                    AY-INT NODE CONFIG
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    STATUS: READY
+                  </span>
+                </div>
+
+                {/* Micro Details List */}
+                <div className="space-y-2.5 font-mono text-xs">
+                  <div className="p-3 rounded-2xl bg-[#060B17] border border-slate-800/80 flex items-center justify-between">
+                    <span className="text-slate-400">Region Cluster:</span>
+                    <span className="text-white font-bold">Asia-South (Islamabad Edge)</span>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-[#060B17] border border-slate-800/80 flex items-center justify-between">
+                    <span className="text-slate-400">HL7 Telemetry:</span>
+                    <span className="text-violet-400 font-bold">Active Sub-0.5ms</span>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-[#060B17] border border-slate-800/80 flex items-center justify-between">
+                    <span className="text-slate-400">Grok Copilot:</span>
+                    <span className="text-emerald-400 font-bold">Online v2.4</span>
+                  </div>
+                </div>
+
+                {/* API Key Box */}
+                <div className="p-3 rounded-2xl bg-[#060B17] border border-slate-800/80 space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                    <span>PUBLIC TEST ACCESS KEY</span>
+                    <button
+                      type="button"
+                      onClick={handleCopyApiKey}
+                      className="text-violet-400 hover:text-violet-300 flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedKey ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
+                      <span>{copiedKey ? "Copied" : "Copy"}</span>
+                    </button>
+                  </div>
+                  <div className="font-mono text-xs text-slate-300 truncate">
+                    {sampleApiKey}
+                  </div>
+                </div>
+
+                {/* Direct Console Route Button */}
+                <button
+                  type="button"
+                  onClick={() => navigate("/dashboard")}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-violet-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+                >
+                  <Activity size={16} className="stroke-[2.5]" />
+                  <span>Enter Live Clinical Portal</span>
+                  <ChevronRight size={15} />
+                </button>
+
+              </div>
+            </div>
+
           </div>
-        </motion.div>
+
+        </div>
+
       </div>
+
+      {/* Interactive Deployment Result Modal */}
+      <AnimatePresence>
+        {showTerminalModal && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-lg rounded-3xl bg-[#0B1220] border border-slate-800 p-6 shadow-2xl space-y-5"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+                    <CheckCircle2 size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white font-mono uppercase">
+                      Cluster Node Initialized
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Target: {clusterNode} // Connected to AY Core
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowTerminalModal(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#070D1B] border border-slate-800 font-mono text-xs space-y-2">
+                <div className="text-emerald-400 flex items-center gap-1.5">
+                  <CheckCircle2 size={14} />
+                  <span>Secure handshake established (TLS 1.3 / AES-256).</span>
+                </div>
+                <div className="text-slate-300">
+                  Telemetry channel mapped to CCU-04 and ER-Bay 3.
+                </div>
+                <div className="text-violet-400">
+                  Grok Copilot hooked to clinical decision endpoints.
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowTerminalModal(false)}
+                  className="px-4 py-2 rounded-xl text-xs bg-slate-900 border border-slate-800 text-slate-300 hover:text-white cursor-pointer"
+                >
+                  Stay on Page
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTerminalModal(false);
+                    navigate("/dashboard");
+                  }}
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-tr from-violet-600 to-indigo-600 text-white hover:opacity-95 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Launch Dashboard</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </section>
   );
 }

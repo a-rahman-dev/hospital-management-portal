@@ -1,167 +1,284 @@
-import { useEffect, useState, useCallback } from "react";
-import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { ArrowUp } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Activity,
+  HeartPulse,
+  Menu,
+  X,
+  ArrowRight,
+  ShieldCheck,
+  Radio,
+  ChevronRight,
+  Sparkles,
+  Stethoscope,
+  Bed,
+  Users,
+  Calendar,
+  Lock,
+  ExternalLink,
+  Layers,
+  CheckCircle2,
+  SlidersHorizontal,
+  Plus,
+} from "lucide-react";
+
+// Sub-components
+import NeuralNetwork from "./NeuralNetwork";
 import Hero from "./Hero";
 import StatsBar from "./StatsBar";
 import Features from "./Features";
 import ModulesShowcase from "./ModulesShowcase";
 import CTA from "./CTA";
 import Footer from "./Footer";
-import { cn } from "@/lib/utils";
 
-/* ============================================================
-   🎨 LANDING PAGE (Rule 5)
-   ─────────────────────────────────────────────
-   Composition:
-   1. Scroll progress bar (top)
-   2. Hero
-   3. StatsBar
-   4. Features
-   5. ModulesShowcase
-   6. CTA
-   7. Footer
-   8. Back-to-top button
-   ============================================================ */
+// Same Portal CoPilot Widget
+import CopilotWidget from "../../components/ai/CopilotWidget";
 
-/* ============================================================
-   🎯 SCROLL PROGRESS BAR
-   ============================================================ */
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-  const prefersReduced = useReducedMotion();
-
-  if (prefersReduced) return null;
-
-  return (
-    <motion.div
-      style={{ scaleX }}
-      className="fixed top-0 left-0 right-0 h-1 z-[100] origin-left bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500"
-      role="progressbar"
-      aria-label="Page scroll progress"
-    />
-  );
-}
-
-/* ============================================================
-   🎯 BACK TO TOP BUTTON
-   ============================================================ */
-function BackToTop() {
-  const [visible, setVisible] = useState(false);
-  const prefersReduced = useReducedMotion();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setVisible(window.scrollY > 400);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleClick = useCallback(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: prefersReduced ? "auto" : "smooth",
-    });
-  }, [prefersReduced]);
-
-  return (
-    <motion.button
-      initial={false}
-      animate={{
-        opacity: visible ? 1 : 0,
-        scale: visible ? 1 : 0.8,
-        pointerEvents: visible ? "auto" : "none",
-      }}
-      transition={{ duration: 0.2 }}
-      onClick={handleClick}
-      aria-label="Back to top"
-      className={cn(
-        "fixed bottom-6 right-6 z-50",
-        "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full",
-        "flex items-center justify-center",
-        "text-white shadow-2xl",
-        "bg-gradient-to-br from-indigo-600 to-violet-600",
-        "shadow-indigo-500/40",
-        "hover:scale-110 active:scale-95",
-        "transition-transform duration-200",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
-      )}
-    >
-      <ArrowUp size={18} strokeWidth={2.5} />
-    </motion.button>
-  );
-}
-
-/* ============================================================
-   🎯 MAIN: Landing
-   ============================================================ */
 export default function Landing() {
-  const prefersReduced = useReducedMotion();
+  const navigate = useNavigate();
+  const scrollContainerRef = useRef(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  /* ============================================================
-     🎯 SCROLL TO TOP ON MOUNT
-     ============================================================ */
+  // Both internal container and window scroll listeners
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    const handleScroll = (e) => {
+      const top = e.target === document ? window.scrollY : e.target.scrollTop;
+      setScrolled(top > 24);
+    };
+
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll, { passive: true });
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
+
+  // Smooth scroll handler for both internal container and window
+  const scrollToSection = (id) => {
+    setMobileMenuOpen(false);
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    if (scrollContainerRef.current && scrollContainerRef.current.scrollHeight > window.innerHeight) {
+      const targetPos = element.offsetTop - 80;
+      scrollContainerRef.current.scrollTo({ top: targetPos, behavior: "smooth" });
+    } else {
+      const yOffset = -80;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
 
   return (
     <div
-      className={cn(
-        "relative min-h-screen",
-        "bg-slate-50 dark:bg-[#0B1220]",
-        "text-slate-900 dark:text-white",
-        "antialiased",
-        "overflow-x-clip"
-      )}
+      ref={scrollContainerRef}
+      className="relative w-full h-screen overflow-y-auto overflow-x-hidden bg-[#070D1B] text-slate-100 selection:bg-violet-500/30 selection:text-violet-200"
+      style={{
+        WebkitOverflowScrolling: "touch",
+        position: "relative",
+      }}
     >
-      {/* ============================================================
-          SCROLL PROGRESS BAR
-         ============================================================ */}
-      <ScrollProgress />
+      {/* Background Synaptic Canvas (Fixed in place) */}
+      <NeuralNetwork />
 
-      {/* ============================================================
-          MAIN SECTIONS
-         ============================================================ */}
-      <main role="main">
-        {/* Hero — with id for anchor link */}
-        <section id="home">
-          <Hero />
-        </section>
+      {/* Global Sticky Enterprise Header - Exact Dashboard Palette */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 select-none ${
+          scrolled
+            ? "bg-[#0B1220]/90 backdrop-blur-xl border-b border-slate-800 shadow-2xl shadow-indigo-950/30 py-3.5"
+            : "bg-transparent py-5"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            
+            {/* Dashboard Matched Logo Brand */}
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center text-white font-black shadow-lg shadow-violet-500/30 transition-transform duration-200 group-hover:scale-105 border border-white/20">
+                <HeartPulse size={22} className="stroke-[2.5]" />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-base font-black tracking-wider text-white flex items-center gap-2">
+                  AY INT.<span className="text-violet-400 font-extrabold">PRO</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/30">
+                    HOSPITAL SUITE
+                  </span>
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  Intelligent Patient Portal & Operations
+                </span>
+              </div>
+            </Link>
 
-        {/* Stats Bar */}
-        <section id="stats">
+            {/* Desktop Navigation Links (Pill Style) */}
+            <nav className="hidden md:flex items-center gap-1.5 bg-[#090F1F]/80 border border-slate-800 rounded-full px-4 py-1.5 backdrop-blur-md">
+              <button
+                type="button"
+                onClick={() => scrollToSection("features")}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
+              >
+                Clinical Modules
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection("telemetry-status")}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
+              >
+                Telemetry Stats
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection("modules")}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
+              >
+                Hospital Architecture
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection("access-portal")}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition cursor-pointer"
+              >
+                Deployment
+              </button>
+            </nav>
+
+            {/* Right Action Tools */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-semibold text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                SYSTEM ONLINE
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard")}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 hover:opacity-95 shadow-lg shadow-violet-500/25 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 border border-white/20 cursor-pointer"
+              >
+                <Activity size={15} className="stroke-[2.5]" />
+                Launch Console
+              </button>
+            </div>
+
+            {/* Mobile Hamburger Toggle */}
+            <div className="md:hidden flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+                aria-label="Toggle Navigation"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Mobile Slide-Down Drawer */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-[#0B1220]/95 border-b border-slate-800 px-5 pt-4 pb-6 space-y-3 backdrop-blur-2xl"
+            >
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px] text-slate-400 font-mono">
+                <span>AY-INT-NODE // ONLINE</span>
+                <span className="text-emerald-400 flex items-center gap-1 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  EHR Nominal
+                </span>
+              </div>
+
+              <div className="flex flex-col space-y-1">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection("features")}
+                  className="px-3.5 py-2.5 rounded-xl text-left text-sm font-semibold text-slate-200 hover:bg-slate-800/80 transition"
+                >
+                  Clinical Modules & EMR
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection("telemetry-status")}
+                  className="px-3.5 py-2.5 rounded-xl text-left text-sm font-semibold text-slate-200 hover:bg-slate-800/80 transition"
+                >
+                  Live Telemetry Ticker
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection("modules")}
+                  className="px-3.5 py-2.5 rounded-xl text-left text-sm font-semibold text-slate-200 hover:bg-slate-800/80 transition"
+                >
+                  Hospital Architecture
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollToSection("access-portal")}
+                  className="px-3.5 py-2.5 rounded-xl text-left text-sm font-semibold text-slate-200 hover:bg-slate-800/80 transition"
+                >
+                  Deployment Protocols
+                </button>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/dashboard");
+                  }}
+                  className="w-full py-3 rounded-xl text-center text-xs font-bold text-white bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 shadow-lg shadow-violet-500/25 border border-white/20"
+                >
+                  Enter Clinical Console
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Main Page Flow */}
+      <main className="relative z-10 w-full pt-20">
+        {/* Hero Section */}
+        <Hero />
+
+        {/* Live Operational Metrics Bar */}
+        <section id="telemetry-status" className="w-full">
           <StatsBar />
         </section>
 
-        {/* Features */}
-        <section id="features">
+        {/* Core Clinical Capabilities */}
+        <section id="features" className="w-full">
           <Features />
         </section>
 
-        {/* Modules Showcase */}
-        <section id="modules">
+        {/* Modular Systems & Schemas Showcase */}
+        <section id="modules" className="w-full">
           <ModulesShowcase />
         </section>
 
-        {/* CTA */}
-        <section id="cta">
+        {/* Deployment & Sandbox Access CTA */}
+        <section id="access-portal" className="w-full">
           <CTA />
         </section>
-
-        {/* Footer */}
-        <Footer />
       </main>
 
-      {/* ============================================================
-          BACK TO TOP
-         ============================================================ */}
-      <BackToTop />
+      {/* Footer */}
+      <Footer />
+
+      {/* Portal CoPilot AI Floating Widget */}
+      <CopilotWidget />
     </div>
   );
 }

@@ -1,409 +1,558 @@
-import { memo, useCallback } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Users,
-  Calendar,
-  Pill,
-  FlaskConical,
-  DollarSign,
-  Stethoscope,
-  Baby,
-  Scissors,
-  Hospital,
-  UserCog,
-  Shield,
-  Settings,
+  Layers,
+  Database,
   ArrowRight,
-  LayoutGrid,
-  Sparkles,
+  CheckCircle2,
+  Activity,
+  HeartPulse,
+  Stethoscope,
+  Receipt,
+  Terminal,
+  Zap,
+  Clock,
+  Bed,
+  Users,
+  AlertTriangle,
+  Play,
+  RotateCw,
+  Sliders,
+  ShieldCheck,
+  ChevronRight,
+  TrendingUp,
+  FileCheck,
+  Check,
+  Copy,
+  SlidersHorizontal,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-/* ============================================================
-   🎨 MODULES SHOWCASE (Rule 5)
-   ─────────────────────────────────────────────
-   Palette: Multi-color per module (semantic)
-   ============================================================ */
-
-/* ============================================================
-   🎯 MODULES DATA (Rule 3)
-   ============================================================ */
-const modules = [
+// ==========================================
+// 🏥 CLINICAL MODULES COMPREHENSIVE DATASET
+// ==========================================
+const CLINICAL_MODULES = [
   {
-    id: 1,
-    name: "Patient Directory",
-    description: "Complete patient management",
-    icon: Users,
-    path: "/patients",
-    gradient: "linear-gradient(135deg, #06b6d4 0%, #0284c7 100%)",
-    glow: "rgba(6, 182, 212, 0.35)",
-    hex: "#06b6d4",
-    count: "1,248",
-  },
-  {
-    id: 2,
-    name: "Appointments",
-    description: "Smart scheduling system",
-    icon: Calendar,
-    path: "/patients/appointments",
-    gradient: "linear-gradient(135deg, #10b981 0%, #0d9488 100%)",
-    glow: "rgba(16, 185, 129, 0.35)",
-    hex: "#10b981",
-    count: "318",
-  },
-  {
-    id: 3,
-    name: "Medications",
-    description: "Prescription tracking",
-    icon: Pill,
-    path: "/patients/medications",
-    gradient: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
-    glow: "rgba(139, 92, 246, 0.35)",
-    hex: "#8b5cf6",
-    count: "892",
-  },
-  {
-    id: 4,
-    name: "Lab Reports",
-    description: "Diagnostic results",
-    icon: FlaskConical,
-    path: "/patients/lab-reports",
-    gradient: "linear-gradient(135deg, #f43f5e 0%, #dc2626 100%)",
-    glow: "rgba(244, 63, 94, 0.35)",
-    hex: "#f43f5e",
-    count: "425",
-  },
-  {
-    id: 5,
-    name: "Billing",
-    description: "Revenue cycle mgmt",
-    icon: DollarSign,
-    path: "/patients/billing",
-    gradient: "linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)",
-    glow: "rgba(245, 158, 11, 0.35)",
-    hex: "#f59e0b",
-    count: "124",
-  },
-  {
-    id: 6,
-    name: "ICD Codes",
-    description: "Diagnostic coding",
+    id: "patients-ehr",
+    name: "Inpatient EMR & Telemetry",
+    category: "Clinical Core",
+    tagline: "Sub-millisecond vitals telemetry with HL7 FHIR bidirectional pipeline",
     icon: Stethoscope,
-    path: "/icd",
-    gradient: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-    glow: "rgba(59, 130, 246, 0.35)",
-    hex: "#3b82f6",
-    count: "14.5K",
+    badge: "FHIR R4 CERTIFIED",
+    badgeType: "emerald",
+    route: "/patients",
+    endpoint: "GET /api/v2/clinical/patients/PT-9041/telemetry",
+    stats: [
+      { label: "Active Census", value: "1,248 pts" },
+      { label: "Stream Latency", value: "0.42 ms" },
+      { label: "Telemetry Leads", value: "12 Channels" },
+      { label: "Bed Allocation", value: "98.4% Accuracy" },
+    ],
+    highlights: [
+      "Continuous Lead II ECG, SpO₂, and Non-Invasive Blood Pressure (NIBP) acquisition",
+      "Dynamic bed-to-ward matrix linking acute CCU, ICU, and Post-Op recovery suites",
+      "Automated clinical alerts triggering instant on-call doctor notification chains",
+      "Bilingual clinician notes with ICD-10 automated diagnosis tagging and e-signatures",
+    ],
+    // High-End Interactive UI Preview Data
+    previewData: {
+      title: "Patient Telemetry Monitor",
+      patient: "Tariq Mahmood (M/58)",
+      mrn: "PT-9041",
+      ward: "Cardiology CCU — Bed 04",
+      doctor: "Dr. Salman Tariq",
+      status: "Stable / Monitored",
+      vitals: [
+        { label: "HEART RATE", value: "74 BPM", status: "normal", color: "text-emerald-400" },
+        { label: "BLOOD PRESSURE", value: "120/78", status: "optimal", color: "text-white" },
+        { label: "OXYGEN (SpO₂)", value: "99%", status: "normal", color: "text-violet-400" },
+        { label: "RESPIRATION", value: "16 rpm", status: "normal", color: "text-cyan-400" },
+      ],
+      alertText: "Continuous telemetry stream active. No acute ST changes in last 4 hours.",
+    },
   },
   {
-    id: 7,
-    name: "OBGYN Diagnosis",
-    description: "Women's health registry",
-    icon: Baby,
-    path: "/obgyn",
-    gradient: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)",
-    glow: "rgba(236, 72, 153, 0.35)",
-    hex: "#ec4899",
-    count: "68",
+    id: "icd-diagnostic",
+    name: "ICD-10 Diagnostic Registry",
+    category: "Diagnostic Intel",
+    tagline: "AI-indexed diagnostic tree covering 72,000+ WHO clinical disease codes",
+    icon: Database,
+    badge: "WHO-ICD10 VALIDATED",
+    badgeType: "violet",
+    route: "/icd",
+    endpoint: "POST /api/v2/diagnostics/icd10/validate-claim",
+    stats: [
+      { label: "Indexed Codes", value: "72,400+" },
+      { label: "Search Velocity", value: "12 ms" },
+      { label: "Scrubber Accuracy", value: "99.8%" },
+      { label: "Cross-Reference", value: "SNOMED CT" },
+    ],
+    highlights: [
+      "Natural language clinical symptom search converting doctor notes into exact ICD-10-CM codes",
+      "Pre-emptive insurance claim scrubber checking medical necessity before submission",
+      "Maternal and neonatal specialized diagnostic registry for high-risk deliveries",
+      "Dual cross-walk integration with CPT procedural billing codes",
+    ],
+    previewData: {
+      title: "Diagnostic Adjudication Node",
+      patient: "Amina Bibi (F/42)",
+      mrn: "PT-8812",
+      ward: "Internal Medicine Ward 2",
+      doctor: "Dr. Ayesha Malik",
+      status: "Verified Adjudicated",
+      diagnoses: [
+        { code: "I21.0", name: "STEMI of anterior wall", status: "Primary / Critical", color: "bg-rose-500/10 text-rose-400 border-rose-500/30" },
+        { code: "I10", name: "Essential Hypertension", status: "Secondary / Chronic", color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30" },
+        { code: "E11.9", name: "Type 2 Diabetes Mellitus", status: "Secondary / Managed", color: "bg-violet-500/10 text-violet-400 border-violet-500/30" },
+      ],
+      alertText: "Pre-claim validation engine: Passed with zero procedural mismatches.",
+    },
   },
   {
-    id: 8,
-    name: "Procedures",
-    description: "CPT procedures registry",
-    icon: Scissors,
-    path: "/procedures",
-    gradient: "linear-gradient(135deg, #f97316 0%, #dc2626 100%)",
-    glow: "rgba(249, 115, 22, 0.35)",
-    hex: "#f97316",
-    count: "210",
+    id: "surgical-ot",
+    name: "Surgical OT & Procedure Suites",
+    category: "Surgical Operations",
+    tagline: "Dynamic theater slotting, sterilization workflows, and anesthesiology logs",
+    icon: Activity,
+    badge: "STERILE CERTIFIED",
+    badgeType: "fuchsia",
+    route: "/procedures",
+    endpoint: "GET /api/v2/surgery/theaters/live-matrix",
+    stats: [
+      { label: "Active Suites", value: "4 Theaters" },
+      { label: "Sterilization Turn", value: "22 mins" },
+      { label: "On-Duty Surgeons", value: "6 Leads" },
+      { label: "Safety Checklist", value: "WHO 100%" },
+    ],
+    highlights: [
+      "Real-time countdown timer tracking incision-to-closure and anesthesia recovery milestones",
+      "Integrated surgical tray tracking ensuring sterile supply chain validation before wheel-in",
+      "Post-Anesthesia Care Unit (PACU) bed auto-reservation upon surgical incision",
+      "Biometric surgeon roster sync preventing fatigue with regulated on-call duty cycles",
+    ],
+    previewData: {
+      title: "OT Theater Live Matrix",
+      theater: "Suite 01 — Cardiothoracic",
+      procedure: "Coronary Artery Bypass (OPCAB)",
+      surgeon: "Dr. Salman Tariq",
+      status: "In Progress (1h 42m)",
+      checkpoints: [
+        { label: "WHO Surgical Safety Sign-In", done: true, time: "08:15 PKT" },
+        { label: "Anesthesia Induction (Bis Index: 42)", done: true, time: "08:30 PKT" },
+        { label: "Surgical Incision & Graft Prep", done: true, time: "08:50 PKT" },
+        { label: "Closure & PACU Bed Reserved (Bed 03)", done: false, time: "11:45 PKT" },
+      ],
+      alertText: "Perfusion parameters optimal. Recovery bed PACU-03 confirmed and staffed.",
+    },
   },
   {
-    id: 9,
-    name: "Facilities",
-    description: "Hospital branches",
-    icon: Hospital,
-    path: "/facilities",
-    gradient: "linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)",
-    glow: "rgba(20, 184, 166, 0.35)",
-    hex: "#14b8a6",
-    count: "15",
-  },
-  {
-    id: 10,
-    name: "Providers",
-    description: "Doctors & specialists",
-    icon: UserCog,
-    path: "/providers",
-    gradient: "linear-gradient(135deg, #6366f1 0%, #2563eb 100%)",
-    glow: "rgba(99, 102, 241, 0.35)",
-    hex: "#6366f1",
-    count: "42",
-  },
-  {
-    id: 11,
-    name: "Insurance",
-    description: "Payer management",
-    icon: Shield,
-    path: "/insurance",
-    gradient: "linear-gradient(135deg, #ef4444 0%, #ec4899 100%)",
-    glow: "rgba(239, 68, 68, 0.35)",
-    hex: "#ef4444",
-    count: "20",
-  },
-  {
-    id: 12,
-    name: "Module Management",
-    description: "System configuration",
-    icon: Settings,
-    path: "/modules",
-    gradient: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
-    glow: "rgba(100, 116, 139, 0.35)",
-    hex: "#64748b",
-    count: "15",
+    id: "insurance-revenue",
+    name: "Revenue Cycle & Claims Hub",
+    category: "Financial Administration",
+    tagline: "Automated billing adjudication, co-pay calculation, and payer compliance",
+    icon: Receipt,
+    badge: "99.2% CLEAN CLAIMS",
+    badgeType: "indigo",
+    route: "/insurance",
+    endpoint: "POST /api/v2/billing/claims/scrub-and-transmit",
+    stats: [
+      { label: "Clean Claim Rate", value: "99.2%" },
+      { label: "Adjudication Time", value: "1.4s" },
+      { label: "Supported Payers", value: "32 Insurers" },
+      { label: "Audit Trailing", value: "Immutable" },
+    ],
+    highlights: [
+      "Instant electronic eligibility verification for corporate and personal health policies",
+      "Automated co-payment calculations separating patient liability from institutional billing",
+      "Rule-engine claim scrubbing reducing rejections by over 80%",
+      "Exportable ANSI 837 EDI files compatible with central government healthcare registries",
+    ],
+    previewData: {
+      title: "Real-time Adjudication Summary",
+      claimId: "CLM-9941-AY",
+      payer: "State Life Corporate Care",
+      patient: "Tariq Mahmood (PT-9041)",
+      status: "Clean / Approved",
+      breakdown: [
+        { label: "CCU Ward & Monitoring (3 Days)", amount: "PKR 45,000" },
+        { label: "Cardiothoracic Surgical Procedures", amount: "PKR 85,000" },
+        { label: "Specialist Consultation & Nursing", amount: "PKR 18,200" },
+        { label: "Diagnostic Labs & Cardiac Imaging", amount: "PKR 12,500" },
+      ],
+      total: "PKR 160,700",
+      patientPortion: "PKR 15,000 (Co-Pay)",
+      alertText: "Pre-authorization code PA-8891-CCU locked. Direct corporate settlement dispatched.",
+    },
   },
 ];
 
-/* ============================================================
-   🎯 MODULE CARD (memoized)
-   ============================================================ */
-const ModuleCard = memo(function ModuleCard({ module, index, onNavigate }) {
-  const Icon = module.icon;
-  const prefersReduced = useReducedMotion();
-
-  return (
-    <motion.button
-      type="button"
-      onClick={() => onNavigate(module.path)}
-      initial={prefersReduced ? false : { opacity: 0, y: 30, scale: 0.95 }}
-      whileInView={prefersReduced ? false : { opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{
-        duration: 0.5,
-        delay: index * 0.05,
-        ease: "easeOut",
-      }}
-      whileHover={prefersReduced ? {} : { y: -6, scale: 1.03 }}
-      whileTap={prefersReduced ? {} : { scale: 0.98 }}
-      aria-label={`${module.name}: ${module.description}. ${module.count} records. Click to open.`}
-      className="group relative text-left cursor-pointer w-full h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 rounded-2xl"
-    >
-      {/* Glow */}
-      <div
-        className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle, ${module.glow} 0%, transparent 70%)`,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Card */}
-      <div className="relative h-full p-4 sm:p-5 rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 overflow-hidden">
-        {/* Top gradient line */}
-        <div
-          className="absolute top-0 left-0 right-0 h-1 opacity-50 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: module.gradient }}
-          aria-hidden="true"
-        />
-
-        {/* Icon + count */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div
-            className={cn(
-              "w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shadow-lg shrink-0",
-              !prefersReduced &&
-                "transition-transform duration-300 group-hover:scale-110"
-            )}
-            style={{
-              background: module.gradient,
-              boxShadow: `0 8px 20px ${module.glow}`,
-            }}
-          >
-            <Icon size={18} className="text-white" strokeWidth={2.5} aria-hidden="true" />
-          </div>
-
-          <div className="px-2 py-1 rounded-lg bg-white/[0.05] border border-white/[0.08] shrink-0">
-            <span
-              className="text-[10px] font-black tabular-nums"
-              style={{ color: module.hex }}
-            >
-              {module.count}
-            </span>
-          </div>
-        </div>
-
-        {/* Name */}
-        <h3 className="text-sm font-bold text-white mb-1 tracking-tight truncate">
-          {module.name}
-        </h3>
-
-        {/* Description */}
-        <p className="text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">
-          {module.description}
-        </p>
-
-        {/* Arrow + Open */}
-        <div className="flex items-center gap-1.5">
-          <span
-            className={cn(
-              "text-[10px] font-black tracking-wider uppercase",
-              !prefersReduced
-                ? "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                : "opacity-70"
-            )}
-            style={{ color: module.hex }}
-          >
-            Open
-          </span>
-          <ArrowRight
-            size={12}
-            strokeWidth={2.5}
-            className={cn(
-              !prefersReduced
-                ? "transition-all duration-300 group-hover:translate-x-1 opacity-0 group-hover:opacity-100"
-                : "opacity-70"
-            )}
-            style={{ color: module.hex }}
-            aria-hidden="true"
-          />
-        </div>
-
-        {/* Bottom corner accent */}
-        <div
-          className="absolute -bottom-6 -right-6 w-20 h-20 rounded-full opacity-0 group-hover:opacity-25 blur-2xl transition-opacity duration-500 pointer-events-none"
-          style={{ background: module.hex }}
-          aria-hidden="true"
-        />
-      </div>
-    </motion.button>
-  );
-});
-
-/* ============================================================
-   🎯 MAIN: ModulesShowcase
-   ============================================================ */
 export default function ModulesShowcase() {
   const navigate = useNavigate();
-  const prefersReduced = useReducedMotion();
 
-  const handleNavigate = useCallback(
-    (path) => {
-      navigate(path);
-    },
-    [navigate]
-  );
+  // State
+  const [selectedModuleId, setSelectedModuleId] = useState(CLINICAL_MODULES[0].id);
+  const [interactiveMode, setInteractiveMode] = useState("preview"); // 'preview' | 'telemetry-stream'
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [pingLatency, setPingLatency] = useState("0.42 ms");
+
+  const currentModule = CLINICAL_MODULES.find((m) => m.id === selectedModuleId) || CLINICAL_MODULES[0];
+
+  // Live Ping Simulator (Rule 2)
+  const handleSimulateSync = () => {
+    setIsSimulating(true);
+    setTimeout(() => {
+      const ms = (0.35 + Math.random() * 0.15).toFixed(2);
+      setPingLatency(`${ms} ms`);
+      setIsSimulating(false);
+    }, 600);
+  };
 
   return (
-    <section className="relative py-16 sm:py-24 bg-[#0b1220] overflow-hidden">
-      {/* Subtle grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(6, 182, 212, 0.5) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(6, 182, 212, 0.5) 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-        }}
-        aria-hidden="true"
-      />
+    <section className="relative w-full py-16 sm:py-24 bg-[#070D1B] text-slate-100 select-none overflow-hidden border-t border-slate-800/80">
+      
+      {/* Background Glow Accents matching Dashboard Palette */}
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[350px] bg-violet-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-[500px] h-[300px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Ambient orb (disabled on reduced motion) */}
-      {!prefersReduced && (
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.1, 0.2, 0.1],
-          }}
-          transition={{ duration: 15, repeat: Infinity }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px] pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, #06b6d4 0%, #8b5cf6 50%, transparent 70%)",
-          }}
-          aria-hidden="true"
-        />
-      )}
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ============================================================
-            SECTION HEADER
-           ============================================================ */}
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0, y: 30 }}
-          whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 sm:mb-16"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-sm mb-4">
-            <LayoutGrid size={14} className="text-cyan-400" aria-hidden="true" />
-            <span className="text-[11px] font-bold text-slate-300 tracking-[0.15em] uppercase">
-              12 Integrated Modules
-            </span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-10 sm:space-y-12">
+        
+        {/* ========================================================
+            1. SECTION HEADER
+           ======================================================== */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-800/80 pb-8">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-xs font-mono font-bold text-violet-400">
+              <Layers size={14} className="stroke-[2.5]" />
+              ENTERPRISE HOSPITAL SUBSYSTEMS
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
+              Interoperable Systems Engineered for{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-fuchsia-400">
+                Hospital Scale.
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
+              High-throughput FHIR resources, automated ICD-10 diagnostic pipelines, and surgical suite matrix operating in real time across departments.
+            </p>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white mb-4">
-            Explore Every{" "}
-            <span className="bg-gradient-to-r from-cyan-400 via-violet-400 to-blue-500 bg-clip-text text-transparent">
-              Module
-            </span>
-          </h2>
-
-          <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Click any module to jump directly into that section of the portal.
-            Each designed with real-world clinical workflows.
-          </p>
-        </motion.div>
-
-        {/* ============================================================
-            MODULES GRID
-           ============================================================ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-          {modules.map((module, idx) => (
-            <ModuleCard
-              key={module.id}
-              module={module}
-              index={idx}
-              onNavigate={handleNavigate}
-            />
-          ))}
+          {/* Module Switcher Pills - Dashboard Styled */}
+          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#0B1220] border border-slate-800 text-xs font-mono shrink-0 overflow-x-auto no-scrollbar max-w-full">
+            {CLINICAL_MODULES.map((mod) => {
+              const isSelected = mod.id === selectedModuleId;
+              return (
+                <button
+                  key={mod.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedModuleId(mod.id);
+                  }}
+                  className={`relative px-4 py-2 rounded-xl font-bold transition-all duration-200 cursor-pointer whitespace-nowrap z-10 ${
+                    isSelected ? "text-white" : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeModuleTab"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      className="absolute inset-0 bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-600 rounded-xl shadow-lg shadow-violet-600/30 -z-10"
+                    />
+                  )}
+                  <span>{mod.name.split(" ")[0]} Hub</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ============================================================
-            BOTTOM CTA
-           ============================================================ */}
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0, y: 30 }}
-          whileInView={prefersReduced ? false : { opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-12 sm:mt-16 text-center"
-        >
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="group relative inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 min-h-[52px] rounded-2xl bg-gradient-to-r from-cyan-500 via-violet-500 to-blue-600 text-white font-bold shadow-2xl shadow-cyan-500/40 hover:shadow-cyan-500/60 transition-all hover:scale-105 active:scale-95 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
+        {/* ========================================================
+            2. INTERACTIVE DUAL-WINDOW SHOWCASE
+           ======================================================== */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          {/* LEFT WINDOW: Deep Clinical Overview & KPIs (5 Cols) */}
+          <motion.div
+            key={`left-${currentModule.id}`}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3 }}
+            className="lg:col-span-5 rounded-[28px] bg-[#0B1220] border border-slate-800 p-6 sm:p-8 flex flex-col justify-between shadow-2xl backdrop-blur-2xl space-y-6"
           >
-            <span
-              className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-              aria-hidden="true"
-            />
-            <Sparkles size={18} className="relative z-10" aria-hidden="true" />
-            <span className="relative z-10">Enter Full Portal</span>
-            <ArrowRight
-              size={18}
-              className={cn(
-                "relative z-10",
-                !prefersReduced &&
-                  "transition-transform group-hover:translate-x-1"
-              )}
-              aria-hidden="true"
-            />
-          </button>
+            <div className="space-y-6">
+              
+              {/* Top Tag & Badge */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+                  {currentModule.category}
+                </span>
 
-          <p className="text-xs text-slate-500 mt-4">
-            12 modules • 40+ pages • Real hospital workflows
-          </p>
-        </motion.div>
+                <span
+                  className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider border ${
+                    currentModule.badgeType === "emerald"
+                      ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/30"
+                      : currentModule.badgeType === "fuchsia"
+                      ? "bg-fuchsia-950/40 text-fuchsia-300 border-fuchsia-500/30"
+                      : "bg-violet-950/40 text-violet-300 border-violet-500/30"
+                  }`}
+                >
+                  {currentModule.badge}
+                </span>
+              </div>
+
+              {/* Title & Tagline */}
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-violet-400 flex items-center justify-center shrink-0">
+                    <currentModule.icon size={22} className="stroke-[2.2]" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    {currentModule.name}
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+                  {currentModule.tagline}
+                </p>
+              </div>
+
+              {/* 4-Cell Clinical Metrics Grid */}
+              <div className="grid grid-cols-2 gap-2.5">
+                {currentModule.stats.map((st, i) => (
+                  <div
+                    key={i}
+                    className="p-3 rounded-2xl bg-[#070D1B] border border-slate-800/90 text-left font-mono"
+                  >
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider">{st.label}</div>
+                    <div className="text-sm font-black text-white mt-0.5">{st.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Highlights List */}
+              <div className="space-y-2.5 pt-2">
+                <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  Architectural Deliverables
+                </div>
+                <div className="space-y-2">
+                  {currentModule.highlights.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300">
+                      <div className="w-4 h-4 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check size={11} className="stroke-[3]" />
+                      </div>
+                      <span className="leading-snug">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Launch Console CTA Button */}
+            <div className="pt-4 border-t border-slate-800/80">
+              <button
+                type="button"
+                onClick={() => navigate(currentModule.route)}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-fuchsia-500 hover:opacity-95 text-white font-bold text-xs shadow-xl shadow-violet-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border border-white/20 transform hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <span>Launch {currentModule.name.split(" ")[0]} Console</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
+
+          </motion.div>
+
+          {/* RIGHT WINDOW: Ultra-Modern Clinical UI Interactive Preview (7 Cols) */}
+          <motion.div
+            key={`right-${currentModule.id}`}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3 }}
+            className="lg:col-span-7 rounded-[28px] bg-[#0B1220] border border-slate-800 shadow-2xl overflow-hidden flex flex-col justify-between"
+          >
+            {/* Window Top Controls Header */}
+            <div className="px-5 py-4 bg-[#0F172A]/80 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500/90" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/90" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90" />
+                </div>
+                <span className="text-xs font-mono text-slate-300 font-bold flex items-center gap-2">
+                  <Activity size={14} className="text-violet-400" />
+                  {currentModule.previewData.title}
+                </span>
+              </div>
+
+              {/* Functional Controls */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSimulateSync}
+                  disabled={isSimulating}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#070D1B] hover:bg-[#111A30] border border-slate-800 text-slate-300 hover:text-white text-xs font-mono transition cursor-pointer"
+                  title="Simulate Real-time Sync"
+                >
+                  <RotateCw size={12} className={isSimulating ? "animate-spin text-violet-400" : "text-violet-400"} />
+                  <span>{isSimulating ? "Syncing..." : "Sync Node"}</span>
+                </button>
+
+                <span className="text-[11px] font-mono px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                  {pingLatency}
+                </span>
+              </div>
+            </div>
+
+            {/* Sub-Header: Live Operational Context */}
+            <div className="px-5 py-3 bg-[#070D1B]/80 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400">Context:</span>
+                <span className="text-white font-bold">{currentModule.previewData.patient || currentModule.previewData.theater}</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-400">
+                <span>Attending:</span>
+                <span className="text-violet-300 font-semibold">{currentModule.previewData.doctor || currentModule.previewData.surgeon || currentModule.previewData.payer}</span>
+              </div>
+            </div>
+
+            {/* Main Interactive Clinical Canvas (Replaces Raw JSON with High-End SaaS UI) */}
+            <div className="p-5 sm:p-6 bg-[#070D1B] flex-1 flex flex-col justify-between space-y-5">
+              
+              {/* 1. If Patient EMR: Live Vitals Grid + Alert Strip */}
+              {currentModule.id === "patients-ehr" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {currentModule.previewData.vitals.map((v, idx) => (
+                      <div key={idx} className="p-3.5 rounded-2xl bg-[#0B1220] border border-slate-800 text-center font-mono">
+                        <div className="text-[10px] text-slate-500 font-semibold uppercase">{v.label}</div>
+                        <div className={`text-lg font-black mt-1 ${v.color}`}>{v.value}</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{v.status}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-[#0B1220] border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-white">Ward Allocation: {currentModule.previewData.ward}</div>
+                      <div className="text-[11px] text-slate-400 font-mono mt-0.5">MRN: {currentModule.previewData.mrn} • Lead II Telemetry Synced</div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                      CCU ACTIVE
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. If ICD Diagnostic: Live Coding Scrubbing Cards */}
+              {currentModule.id === "icd-diagnostic" && (
+                <div className="space-y-3">
+                  <div className="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider">
+                    Assigned Clinical Diagnostic Codes (ICD-10-CM)
+                  </div>
+                  <div className="space-y-2">
+                    {currentModule.previewData.diagnoses.map((dx, idx) => (
+                      <div key={idx} className="p-3 rounded-2xl bg-[#0B1220] border border-slate-800 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-3">
+                          <span className="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-700 font-mono font-bold text-white">
+                            {dx.code}
+                          </span>
+                          <span className="font-semibold text-slate-200">{dx.name}</span>
+                        </div>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${dx.color}`}>
+                          {dx.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. If Surgical OT: Live Procedure Schedule Timeline */}
+              {currentModule.id === "surgical-ot" && (
+                <div className="space-y-3">
+                  <div className="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider flex items-center justify-between">
+                    <span>In-Theater Milestones</span>
+                    <span className="text-rose-400 font-bold">CASE: SURG-4421</span>
+                  </div>
+                  <div className="space-y-2 font-mono text-xs">
+                    {currentModule.previewData.checkpoints.map((cp, idx) => (
+                      <div key={idx} className="p-3 rounded-2xl bg-[#0B1220] border border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-5 h-5 rounded-lg flex items-center justify-center ${cp.done ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-500"}`}>
+                            {cp.done ? <Check size={12} className="stroke-[3]" /> : <Clock size={12} />}
+                          </div>
+                          <span className={cp.done ? "text-slate-200 font-semibold" : "text-slate-500"}>{cp.label}</span>
+                        </div>
+                        <span className="text-slate-400 text-[11px]">{cp.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 4. If Revenue Cycle: Realtime Claims Breakdown */}
+              {currentModule.id === "insurance-revenue" && (
+                <div className="space-y-3">
+                  <div className="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider flex items-center justify-between">
+                    <span>Adjudicated Itemized Billing</span>
+                    <span className="text-emerald-400 font-bold">{currentModule.previewData.claimId}</span>
+                  </div>
+                  <div className="space-y-1.5 font-mono text-xs">
+                    {currentModule.previewData.breakdown.map((item, idx) => (
+                      <div key={idx} className="p-2.5 rounded-xl bg-[#0B1220] border border-slate-800 flex justify-between">
+                        <span className="text-slate-400">{item.label}</span>
+                        <span className="text-white font-bold">{item.amount}</span>
+                      </div>
+                    ))}
+                    <div className="p-3 rounded-2xl bg-[#0B1220] border border-violet-500/30 flex justify-between items-center text-xs mt-2">
+                      <div>
+                        <div className="font-bold text-white">Total Payer Settlement: {currentModule.previewData.total}</div>
+                        <div className="text-[10px] text-slate-400">Patient Liability: {currentModule.previewData.patientPortion}</div>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                        VERIFIED 100%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Bottom Insight Strip */}
+              <div className="p-3 rounded-2xl bg-[#0B1220] border border-slate-800/80 flex items-center justify-between text-xs font-mono">
+                <span className="text-slate-400 truncate max-w-sm sm:max-w-none">
+                  {currentModule.previewData.alertText}
+                </span>
+                <span className="text-violet-400 font-bold flex items-center gap-1 shrink-0">
+                  <ShieldCheck size={13} className="text-emerald-400" />
+                  EHR Compliant
+                </span>
+              </div>
+
+            </div>
+
+            {/* Bottom Status Bar */}
+            <div className="px-5 py-3.5 bg-[#0F172A] border-t border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>REST Node: {currentModule.endpoint.split(" ")[1]}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate(currentModule.route)}
+                className="text-violet-400 hover:text-violet-300 font-bold transition flex items-center gap-1 cursor-pointer"
+              >
+                <span>Full Module Specs</span>
+                <ChevronRight size={13} />
+              </button>
+            </div>
+
+          </motion.div>
+
+        </div>
+
       </div>
+
     </section>
   );
 }
